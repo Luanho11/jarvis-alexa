@@ -11,7 +11,13 @@
     <span class="marca">JARVIS</span>
     <span id="conexion" class="conexion">conectando…</span>
     <time id="reloj" class="reloj"></time>
+    <button id="ver-historial" class="icono" type="button" title="Conversación de hoy" aria-expanded="false" aria-controls="historial">🕘</button>
   </header>
+
+  <section id="historial" class="historial" hidden>
+    <p class="historial-vacio">Aún no hay nada hoy.</p>
+    <ol id="lista-historial"></ol>
+  </section>
 
   <main class="centro">
     <div class="orbe" aria-hidden="true">

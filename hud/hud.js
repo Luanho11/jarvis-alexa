@@ -6,6 +6,7 @@ const NOMBRES_ESTADO = {
 };
 const AMPLITUD = { espera: 0.05, escuchando: 0.2, pensando: 0.5, hablando: 1 };
 const MAX_ACCIONES = 4;
+const MAX_HISTORIAL = 20;
 
 const elementos = {
   estado: document.getElementById("estado"),
@@ -33,6 +34,7 @@ const reducirMovimiento = matchMedia("(prefers-reduced-motion: reduce)");
 let vueltaAEscuchar;
 let finAviso;
 let escritura;
+const historial = [];
 
 function ponerEstado(estado) {
   document.body.dataset.estado = estado;
@@ -67,7 +69,49 @@ function escribirPocoAPoco(texto, duracion) {
   }, duracion / palabras.length);
 }
 
+function guardarEnHistorial(texto) {
+  historial.push({
+    hora: new Date().toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" }),
+    usuario: elementos.usuario.textContent,
+    respuesta: texto,
+  });
+  historial.splice(0, historial.length - MAX_HISTORIAL);
+}
+
+function pintarHistorial() {
+  const lista = document.getElementById("lista-historial");
+  lista.replaceChildren(...historial.map(({ hora, usuario, respuesta }) => {
+    const item = document.createElement("li");
+    const cabeza = document.createElement("p");
+    cabeza.className = "historial-usuario";
+    cabeza.textContent = usuario ? `${hora} · ${usuario}` : hora;
+    const cuerpo = document.createElement("p");
+    cuerpo.textContent = respuesta;
+    const copiar = document.createElement("button");
+    copiar.type = "button";
+    copiar.className = "copiar";
+    copiar.textContent = "Copiar";
+    copiar.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(respuesta);
+      copiar.textContent = "Copiado";
+    });
+    item.append(cabeza, cuerpo, copiar);
+    return item;
+  }));
+  document.querySelector(".historial-vacio").hidden = historial.length > 0;
+  lista.lastElementChild?.scrollIntoView({ block: "end" });
+}
+
+const botonHistorial = document.getElementById("ver-historial");
+botonHistorial.addEventListener("click", () => {
+  const panelHistorial = document.getElementById("historial");
+  panelHistorial.hidden = !panelHistorial.hidden;
+  botonHistorial.setAttribute("aria-expanded", String(!panelHistorial.hidden));
+  if (!panelHistorial.hidden) pintarHistorial();
+});
+
 function hablar(texto) {
+  guardarEnHistorial(texto);
   // Alexa lee unas 15 letras por segundo; al terminar vuelve a escuchar.
   const duracion = Math.max(2000, texto.length * MS_POR_LETRA);
   escribirPocoAPoco(texto, duracion);

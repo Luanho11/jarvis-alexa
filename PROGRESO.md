@@ -35,3 +35,4 @@
 - 05/11 Dev HUD: si Groq o Gemini fallan, el HUD lo explica en lenguaje normal (cuota agotada → respaldo, clave mala → revisa .env, sin internet). 916 tests OK.
 - 05/11 Dev HUD: 4 frases de ejemplo pulsables al abrirlo (se esconden tras la primera orden).
 - 05/11 Supervisor: nota tras las mejoras del HUD 6,5/10 (interactividad 3→6, fluidez 5→6); hechas 7 mejoras del plan.
+- 05/11 Dev HUD: historial de la conversación de hoy (🕘, últimas 20, copiar cada respuesta).

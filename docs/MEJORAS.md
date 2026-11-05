@@ -6,7 +6,7 @@ Cada mejora sale de un punto débil de `docs/EVALUACION.md`. Prioridad: **A** = 
 El HUD solo muestra; no se puede tocar.
 - ✅ **A** Barra de botones en el HUD: ⏸ Parar (corta lo que está diciendo/haciendo), 🔁 Repetir, ✕ Cancelar acción pendiente (apagado, programada), 🔇 Silenciar vigilancia. Nuevo `POST /hud/orden` en `panel.py`, solo local, igual que `/hud/eventos`.
 - ✅ **A** Caja de texto "Escríbele a Jarvis" en el HUD: misma ruta que la voz (`rapido.py` → `cerebro.py`), útil cuando no quieres hablar o el Echo no entendió.
-- **B** Historial desplegable de la conversación de hoy (las últimas 20 líneas), con botón copiar en cada respuesta.
+- ✅ **B** Historial desplegable de la conversación de hoy (las últimas 20 líneas), con botón copiar en cada respuesta.
 - **B** Tarjetas de acción clicables: si abrió un vídeo, archivo o web, la tarjeta lo abre otra vez; si creó un recordatorio, botón "borrar".
 - **C** Atajos de teclado globales: `Ctrl+Alt+J` muestra/oculta el HUD, `Esc` lo minimiza.
 

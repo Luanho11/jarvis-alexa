@@ -14,7 +14,7 @@ Nota honesta, antes de la primera prueba real en tu PC y tu Echo. Las pruebas au
 | Naturalidad | 6 | Personalidad editable con tu nombre, interjecciones de Alexa, respuestas cortas con "¿Sigo?", modo XARA | Hay que decir "Alexa, abre mi jarvis"; la voz es la de Alexa; el límite de 8 s obliga al "y bien" |
 | Diseño visual (HUD) | 6 | Orbe propio + onda tipo Siri, fondo oscuro, muestra lo que oye y responde | No lo he visto en tu pantalla; se ve como una ventana de Edge, no como una app |
 | Fluidez y animaciones | 6 | El HUD se abre minimizado al arrancar, aparece con fundido, la respuesta sale palabra a palabra al ritmo de la voz, colores con transición, respeta "reducir movimiento" | No medido en tu PC (FPS, CPU); sigue siendo una ventana de Edge |
-| Interactividad | 6 | Botones de pausa, anular apagado, dejar de vigilar y ocultar; caja para escribirle; frases de ejemplo pulsables; avisos claros si falla la IA | Sin historial de la conversación ni tarjetas clicables; sin atajo de teclado |
+| Interactividad | 6 | Botones de pausa, anular apagado, dejar de vigilar y ocultar; caja para escribirle; historial de hoy con copiar; frases de ejemplo pulsables; avisos claros si falla la IA | Sin tarjetas clicables ni atajo de teclado; el historial se pierde al cerrar la ventana |
 | Instalación | 5 | Guía no técnica, `iniciar.bat`, inicio automático con Windows | ~20 minutos con ngrok y la consola de Amazon; es un .bat, no una app; el PC debe estar encendido |
 | Coste | 9 | Todo gratis | Las cuotas gratis limitan cuánto lo puedes usar al día |
 | Documentación | 9 | Guía de uso no técnica, README, auditoría, pendientes, registro de avances | — |
@@ -24,7 +24,7 @@ Nota honesta, antes de la primera prueba real en tu PC y tu Echo. Las pruebas au
 **Qué lo subiría más rápido a 8+:**
 1. La primera prueba real con tu Echo y tu PC (sube "probado en real", velocidad y estabilidad).
 2. Convertirlo en app con icono en la bandeja (instalación, diseño).
-3. Historial y tarjetas clicables en el HUD, y medir su fluidez en tu PC.
+3. Tarjetas clicables en el HUD y medir su fluidez en tu PC.
 4. Terminar la rama `trabajo-en-curso` (memoria sin límite, ventanas, modo acompañante).
 
 Todo esto está en PENDIENTES.md.
