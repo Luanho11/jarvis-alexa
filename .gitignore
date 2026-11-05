@@ -4,6 +4,9 @@ agenda.json
 __pycache__/
 .pytest_cache/
 memoria.json
+uso.json
+diario.json
+*.json.tmp
 rutinas.json
 notas/
 persona.md

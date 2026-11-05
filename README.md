@@ -155,6 +155,39 @@ las dos respuestas seguidas.
   `NOTAS_CARPETA` en `.env`. La búsqueda es por palabras, sin tildes: es instantánea, gratis y
   no sale de tu PC.
 
+## Memoria y aprendizaje
+
+Jarvis te va conociendo, sin pagar nada y sin que tus datos salgan de tu PC (salvo lo que ya viaja
+en cada conversación al LLM gratis, Groq o Gemini):
+
+- **Perfil** (`memoria.json`): tu nombre, datos personales, gustos, personas importantes, rutinas y
+  cosas que prefieres evitar. Lo guarda cuando le cuentas algo duradero ("me llamo Ana", "mi hija se
+  llama Lucía", "no me gusta el reguetón") o le dices "recuerda que...". Guarda hasta 50 datos: si
+  le dices algo más completo sustituye al dato viejo y, si se llena, olvida primero lo más antiguo de lo
+  menos importante (nunca tu nombre). La memoria antigua (una lista de frases) se convierte sola.
+- **Costumbres** (`uso.json`): solo contadores de lo que le pides: la música y los artistas, los programas
+  que abres, el volumen que sueles poner, tus modos y a qué hora del día le hablas. Así sabe, por ejemplo,
+  que sueles escuchar Bad Bunny o poner el volumen al 30 %. **No guarda** lo que le pides escribir o
+  dictar, lo que buscas en internet, tus notas ni capturas. Lo reciente pesa más que lo de hace meses.
+- **Conversaciones** (`diario.json`): al terminar una conversación de al menos dos frases, en segundo
+  plano y con una sola consulta al LLM, apunta de qué hablasteis en una frase y añade al perfil lo nuevo
+  que contaste de ti. Guarda los últimos 30 días; así puede decirte "la última vez hablamos de tu viaje".
+- En cada respuesta Jarvis lee un resumen corto de todo esto (unos 1.500 caracteres como máximo, para no
+  gastar la cuota gratis); leerlo tarda menos de un milisegundo.
+
+Para verlo o borrarlo:
+
+- "¿Qué sabes de mí?" te lo cuenta. Los tres archivos están en la carpeta de Jarvis y se pueden abrir
+  con el Bloc de notas (si rompes `memoria.json` al editarlo, Jarvis sigue funcionando sin memoria y no
+  lo sobrescribe hasta que lo arregles).
+- "Olvida que vivo en Lima" borra ese dato. "Olvida todo lo que sabes de mí" te pide confirmar: di
+  **"sí, bórralo todo"** y borra los tres archivos (tus notas y tu agenda no se tocan). También puedes
+  borrarlos a mano con Jarvis cerrado.
+- Ninguno se sube a Git (están en `.gitignore`).
+
+Qué **no** hace: no se reentrena ni cambia el modelo de IA. "Aprender" aquí es memoria: el perfil, las
+costumbres y los resúmenes que se le recuerdan en cada respuesta. Si borras los archivos, empieza de cero.
+
 ## Personalidad
 
 Jarvis habla como una persona cercana: ingenioso, leal y con humor sutil, te llama por tu
@@ -228,7 +261,7 @@ conversación se minimiza a los pocos segundos y la siguiente vez vuelve a apare
 - Los planes gratis tienen límites por minuto y por día; con las dos claves casi no se notan.
 - En modo desarrollo la skill solo funciona en **tu cuenta de Amazon** y tus dispositivos.
 - El **idioma de la skill debe coincidir con el de tu Echo**; si no, Alexa no la encuentra.
-- Agenda, memoria, modos y notas se guardan solo en tu PC (`agenda.json`, `memoria.json`, `rutinas.json`, `notas`).
+- Agenda, memoria, costumbres, modos y notas se guardan solo en tu PC (`agenda.json`, `memoria.json`, `uso.json`, `diario.json`, `rutinas.json`, `notas`).
 
 ## Problemas comunes
 
