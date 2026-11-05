@@ -39,3 +39,4 @@
 - 05/11 Dev HUD: cuenta atrás de apagado/reinicio con botón Cancelar; el orbe se encoge en ventanas bajas para que los botones nunca queden fuera. 918 tests OK.
 - 05/11 Dev UX: "¿qué puedes hacer?"/"ayuda" contesta al instante sin IA con 6 categorías (también la ayuda de Alexa). 924 tests OK.
 - 05/11 Dev Persona: no repite la misma confirmación ("Hecho.") dos veces seguidas. 925 tests OK.
+- 05/11 Dev Calidad: las 71 acciones se ofrecen al LLM como 51 herramientas (grupos volumen, reproduccion, ventana, mouse, energia, vigilancia, modos con "accion"); por dentro siguen los nombres individuales, así que freno anti-inyección, respuestas directas, ruta rápida y cerebro profundo no cambian. Esquemas ~4.200 → ~3.500 tokens. 931 tests OK.

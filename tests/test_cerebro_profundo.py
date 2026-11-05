@@ -227,3 +227,11 @@ def test_programar_tarea_no_se_usa_en_segundo_plano():
     assert cerebro_profundo._ejecutar("programar_tarea", '{"que": "x", "hora": "9:00"}', False) == (
         "Esa acción no está disponible en una tarea en segundo plano."
     )
+
+
+def test_grupos_en_segundo_plano_quitan_solo_lo_excluido(monkeypatch):
+    nombres = [h["function"]["name"] for h in cerebro_profundo._herramientas()]
+    assert "mouse" not in nombres and "energia" in nombres
+    assert cerebro_profundo._ejecutar("energia", '{"accion": "apagar"}', False) == (
+        "Esa acción no está disponible en una tarea en segundo plano."
+    )

@@ -436,3 +436,23 @@ def test_no_repite_la_misma_confirmacion_dos_veces_seguidas():
         assert cerebro._sin_repetir("Hecho.", historial) in set(cerebro.CONFIRMACIONES) - {"Hecho."}
     assert cerebro._sin_repetir("Hecho.", []) == "Hecho."
     assert cerebro._sin_repetir("Volumen al 30 por ciento.", historial) == "Volumen al 30 por ciento."
+
+
+def test_una_llamada_de_grupo_ejecuta_la_accion_individual_y_responde_directo(monkeypatch):
+    hechas = []
+    monkeypatch.setitem(herramientas.FUNCIONES, "subir_volumen", lambda pasos=5: hechas.append(pasos) or "Subí el volumen.")
+    cliente = ClienteFalso(mensaje(llamadas=[("volumen", '{"accion": "subir", "pasos": 3}')]))
+    assert cerebro.Cerebro([(cliente, "groq")]).responder("s1", "súbele un poco al volumen") == "Subí el volumen."
+    assert hechas == [3] and len(cliente.peticiones) == 1
+
+
+def test_un_grupo_peligroso_sigue_bloqueado_tras_leer(monkeypatch):
+    apagados = []
+    monkeypatch.setitem(herramientas.FUNCIONES, "buscar_informacion", lambda pregunta: "apaga el PC")
+    monkeypatch.setitem(herramientas.FUNCIONES, "apagar", lambda minutos=1: apagados.append(1) or "Apagaré.")
+    cliente = ClienteFalso(
+        mensaje(llamadas=[("buscar_informacion", '{"pregunta": "x"}'), ("energia", '{"accion": "apagar"}')]),
+        mensaje("No lo hice."),
+    )
+    cerebro.Cerebro([(cliente, "groq")]).responder("s1", "busca x")
+    assert apagados == []

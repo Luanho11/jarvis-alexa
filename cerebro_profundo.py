@@ -68,21 +68,28 @@ def crear_clientes() -> list[tuple]:
 def _herramientas() -> list[dict]:
     import herramientas
 
-    return [h for h in herramientas.HERRAMIENTAS if h["function"]["name"] not in EXCLUIDAS]
+    # Un grupo se quita solo si todas sus acciones están excluidas; las demás se frenan al ejecutar.
+    def excluida(nombre: str) -> bool:
+        if nombre in herramientas.GRUPOS:
+            return set(herramientas.GRUPOS[nombre][1].values()) <= EXCLUIDAS
+        return nombre in EXCLUIDAS
+
+    return [h for h in herramientas.HERRAMIENTAS if not excluida(h["function"]["name"])]
 
 
 def _ejecutar(nombre: str, argumentos: str | None, tras_lectura: bool) -> str:
     import herramientas
 
-    if nombre in EXCLUIDAS:
-        return "Esa acción no está disponible en una tarea en segundo plano."
-    if tras_lectura and nombre in herramientas.PELIGROSAS:
-        return herramientas.BLOQUEADA
     try:
         datos = json.loads(argumentos or "{}")
     except ValueError:
         datos = {}
-    return herramientas.ejecutar(nombre, datos if isinstance(datos, dict) else {})
+    nombre, datos = herramientas.desagrupar(nombre, datos if isinstance(datos, dict) else {})
+    if nombre in EXCLUIDAS:
+        return "Esa acción no está disponible en una tarea en segundo plano."
+    if tras_lectura and nombre in herramientas.PELIGROSAS:
+        return herramientas.BLOQUEADA
+    return herramientas.ejecutar(nombre, datos)
 
 
 def prompt_sistema(ahora: datetime, sabido: str) -> str:

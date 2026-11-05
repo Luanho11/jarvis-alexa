@@ -33,7 +33,7 @@ El HUD solo muestra; no se puede tocar.
 - **C** Medir FPS y CPU del HUD en tu PC; objetivo 60 fps y <3 % de CPU en espera (pausar animaciones cuando está oculto).
 
 ## 5. Calidad, simpleza y limpieza del código (7 → 9)
-- **A** Menos herramientas para la IA: agrupar las 71 en ~35 (por ejemplo `ventana(accion=minimizar|maximizar|cerrar)`, `mouse(accion=…)`, `memoria(accion=…)`). Menos tokens, menos errores de la IA, Groq dura más.
+- ✅ (71 → 51; agenda, notas y memoria siguen sueltas porque el prompt las nombra) **A** Menos herramientas para la IA: agrupar las 71 en ~35 (por ejemplo `ventana(accion=minimizar|maximizar|cerrar)`, `mouse(accion=…)`, `memoria(accion=…)`). Menos tokens, menos errores de la IA, Groq dura más.
 - **A** `herramientas.py` (319 líneas) partido por área (`herramientas/pc.py`, `herramientas/info.py`…) con el registro en un solo sitio.
 - **B** Un único archivo de ajustes (`ajustes.json`) en vez de varios sueltos (`rutinas.json`, `programadas.json`, `echo_uso.json`…), con valores por defecto en código.
 - **B** Registro (log) ordenado en `logs/jarvis.log` con rotación, en vez de solo la consola; el HUD puede enseñar los últimos errores.

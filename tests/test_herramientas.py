@@ -2,10 +2,32 @@ import cerebro_profundo
 import herramientas
 
 
-def test_hay_una_herramienta_por_funcion():
+def test_cada_funcion_se_ofrece_sola_o_dentro_de_un_grupo():
     nombres = [h["function"]["name"] for h in herramientas.HERRAMIENTAS]
-    assert len(nombres) == len(set(nombres)) == 71
-    assert set(nombres) == set(herramientas.FUNCIONES)
+    assert len(nombres) == len(set(nombres)) == 51
+    sueltas = set(nombres) - herramientas.GRUPOS.keys()
+    assert sueltas | herramientas.AGRUPADAS.keys() == set(herramientas.FUNCIONES)
+    assert not sueltas & herramientas.AGRUPADAS.keys()
+
+
+def test_desagrupar_traduce_al_nombre_individual_con_sus_argumentos():
+    assert herramientas.desagrupar("volumen", {"accion": "fijar", "porcentaje": 30, "pasos": 2}) == (
+        "fijar_volumen", {"porcentaje": 30},
+    )
+    assert herramientas.desagrupar("energia", {"accion": "apagar", "minutos": 2}) == ("apagar", {"minutos": 2})
+    assert herramientas.desagrupar("clima", {"ciudad": "Lima"}) == ("clima", {"ciudad": "Lima"})
+
+
+def test_un_grupo_sin_accion_valida_explica_las_opciones():
+    nombre, argumentos = herramientas.desagrupar("volumen", {"accion": "explotar"})
+    assert herramientas.ejecutar(nombre, argumentos).startswith("Falta una accion válida para volumen: subir, bajar")
+
+
+def test_los_grupos_ofrecen_la_accion_obligatoria():
+    esquemas = {h["function"]["name"]: h["function"]["parameters"] for h in herramientas.HERRAMIENTAS}
+    for grupo, (_, acciones) in herramientas.GRUPOS.items():
+        assert esquemas[grupo]["required"] == ["accion"]
+        assert esquemas[grupo]["properties"]["accion"]["enum"] == list(acciones)
 
 
 def test_requeridos_existen_en_propiedades():

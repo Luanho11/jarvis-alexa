@@ -290,8 +290,8 @@ class Cerebro:
             mensajes.append(mensaje.model_dump(exclude_none=True, exclude={"reasoning"}))
             resultados = []
             for llamada in mensaje.tool_calls:
-                nombre = llamada.function.name
-                resultado = self._accion(nombre, _leer_argumentos(llamada.function.arguments), leido, medicion, pedido)
+                nombre, argumentos = herramientas.desagrupar(llamada.function.name, _leer_argumentos(llamada.function.arguments))
+                resultado = self._accion(nombre, argumentos, leido, medicion, pedido)
                 leido = leido or nombre in herramientas.LECTURA
                 resultados.append((nombre, resultado))
                 mensajes.append({"role": "tool", "tool_call_id": llamada.id, "content": resultado})

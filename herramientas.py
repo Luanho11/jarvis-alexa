@@ -230,6 +230,62 @@ DIRECTAS = {
     "dejar_de_vigilar", "encargar_tarea", "guardar_nota", "programar_tarea", "borrar_programada",
     "copiar_al_portapapeles", "calcular", "convertir_unidad",
 }
+# Herramientas parecidas que el LLM ve como una sola con "accion": cada herramienta enviada cuesta tokens en
+# cada petición y el plan gratis de Groq limita los tokens por minuto. Por dentro todo sigue con el nombre
+# individual, así que LECTURA, PELIGROSAS, DIRECTAS, la ruta rápida y el aprendizaje no cambian.
+GRUPOS = {
+    "volumen": ("Volumen del PC.", {
+        "subir": "subir_volumen", "bajar": "bajar_volumen", "fijar": "fijar_volumen", "silenciar": "silenciar",
+    }),
+    "reproduccion": ("Música y videos que suenan en el PC (adelantar y retroceder: YouTube).", {
+        "pausar_reanudar": "pausar_reanudar", "siguiente": "siguiente", "anterior": "anterior",
+        "pantalla_completa": "pantalla_completa", "adelantar": "adelantar", "retroceder": "retroceder",
+        "siguiente_video": "siguiente_video",
+    }),
+    "ventana": ("Ventanas de Windows (enfocar: trae al frente la del nombre).", {
+        "minimizar_todo": "minimizar_todo", "enfocar": "enfocar_ventana", "cerrar": "cerrar_ventana",
+        "maximizar": "maximizar_ventana",
+    }),
+    "mouse": ("Mouse: mover, scroll o clic donde está.", {
+        "mover": "mover_mouse", "desplazar": "desplazar", "clic": "hacer_clic",
+    }),
+    "energia": ("Apagar, reiniciar (tras unos minutos), cancelar eso, suspender o bloquear el PC.", {
+        "apagar": "apagar", "reiniciar": "reiniciar", "cancelar_apagado": "cancelar_apagado",
+        "suspender": "suspender", "bloquear": "bloquear",
+    }),
+    "vigilancia": ("Vigila la pantalla y comenta en el panel (o en voz), o deja de hacerlo.", {
+        "vigilar": "vigilar_pantalla", "dejar": "dejar_de_vigilar",
+    }),
+    "modos": ("Modos: activar una rutina (trabajo, estudio) o forma de hablar (profesor, xara...), o listarlos.", {
+        "activar": "activar_modo", "listar": "listar_modos",
+    }),
+}
+AGRUPADAS = {original: grupo for grupo, (_, acciones) in GRUPOS.items() for original in acciones.values()}
+ESQUEMAS = {h["function"]["name"]: h["function"] for h in HERRAMIENTAS}
+
+
+def _agrupar(grupo: str) -> dict:
+    descripcion, acciones = GRUPOS[grupo]
+    parametros = {"accion": {"type": "string", "enum": list(acciones)}}
+    for original in acciones.values():
+        parametros.update(ESQUEMAS[original]["parameters"]["properties"])
+    return _herramienta(grupo, descripcion, parametros, ("accion",))
+
+
+HERRAMIENTAS = [h for h in HERRAMIENTAS if h["function"]["name"] not in AGRUPADAS] + [_agrupar(g) for g in GRUPOS]
+
+
+def desagrupar(nombre: str, argumentos: dict) -> tuple[str, dict]:
+    """Traduce una llamada de grupo ("volumen", accion="subir") a la individual ("subir_volumen") con solo sus argumentos."""
+    if nombre not in GRUPOS:
+        return nombre, argumentos
+    original = GRUPOS[nombre][1].get(argumentos.get("accion"))
+    if original is None:
+        return nombre, argumentos
+    propios = ESQUEMAS[original]["parameters"]["properties"]
+    return original, {clave: valor for clave, valor in argumentos.items() if clave in propios}
+
+
 BLOQUEADA = "Por seguridad no hago esto justo después de leer internet, la pantalla o las notas. Pide al usuario que lo confirme."
 
 FUNCIONES = {
@@ -309,6 +365,8 @@ FUNCIONES = {
 
 def ejecutar(nombre: str, argumentos: dict) -> str:
     funcion = FUNCIONES.get(nombre)
+    if nombre in GRUPOS:
+        return f"Falta una accion válida para {nombre}: {', '.join(GRUPOS[nombre][1])}."
     if funcion is None:
         return f"No conozco la acción {nombre}."
     try:
