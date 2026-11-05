@@ -214,3 +214,16 @@ def test_crear_clientes_prefiere_gemini_profundo_sin_duplicar(monkeypatch):
 
     monkeypatch.setattr(config, "GEMINI_API_KEY", "")
     assert [m for _, m in cerebro_profundo.crear_clientes()] == [config.MODELO_GROQ]
+
+
+def test_cuantos_pendientes_no_los_consume():
+    cerebro_profundo._pendientes.extend(["Uno.", "Dos."])
+    assert cerebro_profundo.cuantos_pendientes() == 2
+    assert cerebro_profundo.resultados_pendientes() == ["Uno.", "Dos."]
+    assert cerebro_profundo.cuantos_pendientes() == 0
+
+
+def test_programar_tarea_no_se_usa_en_segundo_plano():
+    assert cerebro_profundo._ejecutar("programar_tarea", '{"que": "x", "hora": "9:00"}', False) == (
+        "Esa acción no está disponible en una tarea en segundo plano."
+    )

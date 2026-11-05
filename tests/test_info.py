@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 from typing import ClassVar
 
+import pytest
 import requests
 
 from acciones import info
@@ -127,3 +128,14 @@ def test_convertir_moneda_desconocida(monkeypatch):
 def test_convertir_moneda_sin_red(monkeypatch):
     monkeypatch.setattr(info.requests, "get", _sin_red)
     assert info.convertir_moneda(1, "USD", "EUR") == "No pude consultar el cambio de moneda ahora."
+
+
+def test_titulares_devuelve_la_lista_recortada(monkeypatch):
+    monkeypatch.setattr(info.requests, "get", lambda url, params, timeout: _respuesta(contenido=RSS))
+    assert info.titulares(1) == ["Sube el dólar"]
+
+
+def test_titulares_sin_red_lanza(monkeypatch):
+    monkeypatch.setattr(info.requests, "get", _sin_red)
+    with pytest.raises(requests.ConnectionError):
+        info.titulares(3)

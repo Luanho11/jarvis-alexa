@@ -58,23 +58,28 @@ def buscar_informacion(pregunta: str) -> str:
     return " | ".join(resultados)
 
 
-def noticias(tema: str = "") -> str:
+def titulares(cantidad: int = 4, tema: str = "") -> list[str]:
+    """Titulares de Google News. Sin red o con XML roto lanza la excepción."""
     idioma = "es" if PAIS_NOTICIAS == "ES" else "es-419"
     url = "https://news.google.com/rss/search" if tema else "https://news.google.com/rss"
     parametros = {"hl": idioma, "gl": PAIS_NOTICIAS, "ceid": f"{PAIS_NOTICIAS}:{idioma}"}
     if tema:
         parametros["q"] = tema
+    respuesta = requests.get(url, params=parametros, timeout=TIEMPO_LIMITE)
+    respuesta.raise_for_status()
+    titulos = [item.findtext("title", "") for item in ET.fromstring(respuesta.content).iter("item")]
+    # Google News termina cada titular con " - Medio"; para voz sobra.
+    return [titulo.rsplit(" - ", 1)[0] for titulo in titulos if titulo][:cantidad]
+
+
+def noticias(tema: str = "") -> str:
     try:
-        respuesta = requests.get(url, params=parametros, timeout=TIEMPO_LIMITE)
-        respuesta.raise_for_status()
-        titulos = [item.findtext("title", "") for item in ET.fromstring(respuesta.content).iter("item")]
+        elegidos = titulares(4, tema)
     except (requests.RequestException, ET.ParseError):
         return "No pude consultar las noticias ahora."
-    # Google News termina cada titular con " - Medio"; para voz sobra.
-    titulares = [titulo.rsplit(" - ", 1)[0] for titulo in titulos if titulo][:4]
-    if not titulares:
+    if not elegidos:
         return f"No encontré noticias sobre {tema}." if tema else "No encontré noticias."
-    return "Titulares: " + ". ".join(titulares) + "."
+    return "Titulares: " + ". ".join(elegidos) + "."
 
 
 def convertir_moneda(cantidad: float, de: str, a: str) -> str:

@@ -24,12 +24,13 @@ PAUSA_LIMITE = 10
 EN_CURSO = "en curso"
 TERMINADA = "terminada"
 FALLIDA = "fallida"
+EMPEZADA = "Me pongo con eso, te aviso cuando termine."
 
 # Una tarea en segundo plano no debe recursar ni dejar el PC inservible sin que el usuario lo vea. Tampoco usa
 # el mouse: actuaría sobre lo que haya en pantalla en ese momento, quizá mientras el usuario trabaja.
 EXCLUIDAS = {
     "encargar_tarea", "estado_tareas", "apagar", "reiniciar", "suspender", "bloquear",
-    "mover_mouse", "desplazar", "hacer_clic", "clic_en",
+    "mover_mouse", "desplazar", "hacer_clic", "clic_en", "programar_tarea",
 }
 
 registro = logging.getLogger(__name__)
@@ -178,7 +179,7 @@ def encargar_tarea(descripcion: str) -> str:
         _tareas.append(tarea)
     panel.emitir("accion", f"Empiezo la tarea: {descripcion}")
     threading.Thread(target=_trabajar, args=(tarea, clientes), daemon=True).start()
-    return "Me pongo con eso, te aviso cuando termine."
+    return EMPEZADA
 
 
 def estado_tareas() -> str:
@@ -194,6 +195,12 @@ def estado_tareas() -> str:
         else:
             partes.append(tarea.resultado)
     return " ".join(partes)
+
+
+def cuantos_pendientes() -> int:
+    """Resultados aún no dichos por Alexa, sin vaciarlos."""
+    with _candado:
+        return len(_pendientes)
 
 
 def resultados_pendientes() -> list[str]:

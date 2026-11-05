@@ -76,3 +76,20 @@ def test_spotify_sin_app_usa_la_web(monkeypatch, navegador):
     monkeypatch.setattr(web.os, "startfile", sin_app, raising=False)
     web.abrir_en_spotify("bad bunny")
     assert navegador == ["https://open.spotify.com/search/bad%20bunny"]
+
+
+DATOS_PRONOSTICO = {
+    **DATOS_CLIMA,
+    "weather": [{"maxtempC": "29", "mintempC": "18", "hourly": [{"chanceofrain": "0"}, {"chanceofrain": "40"}]}],
+}
+
+
+def test_pronostico_hoy(monkeypatch):
+    monkeypatch.setattr(web.requests, "get", lambda url, params, timeout: _respuesta(DATOS_PRONOSTICO))
+    assert web.pronostico_hoy("Lima") == "En Lima 18 grados, máxima 29, mínima 18 y 40 % de lluvia."
+
+
+def test_pronostico_hoy_sin_datos_lanza(monkeypatch):
+    monkeypatch.setattr(web.requests, "get", lambda url, params, timeout: _respuesta(DATOS_CLIMA))
+    with pytest.raises(KeyError):
+        web.pronostico_hoy("Lima")

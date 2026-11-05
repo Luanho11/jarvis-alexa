@@ -63,12 +63,20 @@ def revisar(ahora: datetime) -> None:
 
 
 def _vigilar() -> None:
+    # programadas usa avisar de este módulo: importarlo arriba sería circular.
+    from acciones import programadas
+
     while True:
-        # Un agenda.json ilegible no debe parar los avisos para siempre.
+        ahora = datetime.now()
+        # Un agenda.json o programadas.json ilegible no debe parar los avisos para siempre.
         try:
-            revisar(datetime.now())
+            revisar(ahora)
         except Exception:
             registro.exception("No pude revisar la agenda")
+        try:
+            programadas.revisar(ahora)
+        except Exception:
+            registro.exception("No pude revisar las tareas programadas")
         time.sleep(INTERVALO)
 
 

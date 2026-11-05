@@ -128,3 +128,26 @@ def test_avisar_sin_echo(echo, monkeypatch):
     monkeypatch.setattr(recordatorios.config, "AVISOS_EN_ECHO", False)
     recordatorios.avisar("Recordatorio: dentista")
     assert echo == []
+
+
+def test_el_vigilante_revisa_agenda_y_programadas_aunque_fallen(monkeypatch):
+    from acciones import programadas
+
+    revisadas = []
+
+    def falla(ahora):
+        revisadas.append("agenda")
+        raise ValueError("agenda.json roto")
+
+    class Parar(Exception):
+        pass
+
+    def parar(segundos):
+        raise Parar
+
+    monkeypatch.setattr(recordatorios, "revisar", falla)
+    monkeypatch.setattr(programadas, "revisar", lambda ahora: revisadas.append("programadas"))
+    monkeypatch.setattr(recordatorios.time, "sleep", parar)
+    with pytest.raises(Parar):
+        recordatorios._vigilar()
+    assert revisadas == ["agenda", "programadas"]
