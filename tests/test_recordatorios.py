@@ -105,6 +105,8 @@ def test_powershell_recibe_el_texto_intacto(monkeypatch):
     monkeypatch.setattr(recordatorios.subprocess, "Popen", lambda args, **_: lanzados.append(args))
     texto = "Cita con O'Brien: \"café\" a las 5 $(calc) `n ñandú"
     recordatorios.avisar(texto, en_echo=False)
+    # subprocess.run usa por dentro el Popen que acabamos de sustituir: hay que devolver el real.
+    monkeypatch.undo()
     salida = subprocess.run(lanzados[0], capture_output=True, timeout=60)
     assert salida.stdout.decode("utf-8").strip() == texto
 

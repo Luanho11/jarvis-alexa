@@ -79,7 +79,7 @@ def medir(n: int, pausa: float, falso: bool) -> str:
     cliente = servidor.crear_app(jarvis, verificar=False).test_client()
     lineas = []
     for nombre, texto in ESCENARIOS:
-        tiempos, modelos, llamadas = [], [], []
+        tiempos, llamadas, hechas = [], [], []
         for vez in range(n):
             if llamadas and llamadas[-1] and not falso and pausa:
                 # El plan gratis de Groq da 8.000 tokens por minuto: sin pausa saltaría a Gemini y mediría otra cosa.
@@ -91,14 +91,23 @@ def medir(n: int, pausa: float, falso: bool) -> str:
                 raise SystemExit(f"El servidor respondió {respuesta.status_code} a '{texto}'")
             medicion = jarvis.ultima_medicion
             llamadas.append(len(medicion.llamadas))
-            modelos += [modelo for modelo, _ in medicion.llamadas]
-        usados = ", ".join(sorted(set(modelos))) or "ninguno"
+            hechas += medicion.llamadas
+        usados = ", ".join(sorted({llamada.modelo for llamada in hechas})) or "ninguno"
         lineas.append(
             f"{nombre} — \"{texto}\"\n"
             f"  mediana {statistics.median(tiempos):.0f} ms · p90 {percentil(tiempos, 90):.0f} ms · "
             f"mín {min(tiempos):.0f} · máx {max(tiempos):.0f} · "
             f"llamadas al LLM por petición {statistics.mean(llamadas):.1f} · modelos: {usados}"
         )
+        if hechas and not falso:
+            # Lo que cuenta en el límite de Groq es la entrada fuera de la caché más la salida.
+            entrada = statistics.mean(llamada.entrada for llamada in hechas)
+            cache = statistics.mean(llamada.cache for llamada in hechas)
+            salida = statistics.mean(llamada.salida for llamada in hechas)
+            lineas.append(
+                f"  tokens por llamada: {entrada:.0f} de entrada ({cache:.0f} en caché), {salida:.0f} de salida"
+                f" → cuentan para el límite unos {entrada - cache + salida:.0f}"
+            )
     return "\n".join(lineas)
 
 

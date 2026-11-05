@@ -1,5 +1,23 @@
 # Cambios
 
+## 1.3.0 — 05/11/2026
+
+- Cuota gratis para todo el día: segundo modelo de Groq (`gpt-oss-20b`, con su propia cuota) antes de Gemini;
+  tras un 429 se salta ese modelo el tiempo que indica `retry-after` (máx. 1 h) en vez de reintentar en cada
+  petición; historial enviado limitado a ~3.000 caracteres. Con la caché de Groq, una conversación gasta
+  ~800 tokens de cuota en vez de ~7.500 (1.1.0).
+- Respuestas largas: como mucho ~55 palabras (~20 s) por turno, cortando al final de una frase, y "¿Sigo?";
+  "sí"/"sigue" dice el resto y "no" u otra pregunta lo descarta. El prompt pide no pasar de 55 palabras.
+- Memoria conectada: al terminar la sesión aprende de ella en segundo plano; herramientas `que_sabes_de_mi`,
+  `olvidar_todo` (solo con la frase exacta del usuario) y `recordar` con categoría.
+- Leer documentos y webs (`leer_documento`) y correos de Gmail (`leer_correos`), con el freno de seguridad
+  de lecturas; formas de hablar (profesor, traductor, xara...) al final del contexto y frases en inglés con
+  su voz (`<lang>`); al salir vuelve a hablar normal.
+- Resumen del día ("buenos días", "mi resumen", sin LLM), tareas programadas, portapapeles y cálculo exacto
+  conectados como herramientas (71 en total); programar y borrar tareas frenados tras una lectura.
+- Alexa: ejemplos "sigue", "continúa", frases de 23 y 30 palabras (Alexa recorta el comodín a la longitud
+  de lo que conoce) y "léeme el contrato", "tengo correos nuevos", "modo traductor", "modo xara".
+
 ## 1.2.0 — 05/11/2026
 
 - Velocidad: las órdenes frecuentes (multimedia, volumen, "pon X", abrir/cerrar, pantalla completa,

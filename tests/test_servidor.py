@@ -16,6 +16,10 @@ class CerebroFalso:
 
     def olvidar(self, sesion_id):
         self.olvidadas.append(sesion_id)
+        return [{"role": "user", "content": "hola"}]
+
+    def completar(self, mensajes):
+        return ""
 
 
 class CerebroLento(CerebroFalso):
@@ -260,3 +264,66 @@ def test_con_novedades_antepone_los_encargos_terminados(monkeypatch):
 def test_con_novedades_sin_encargos_deja_el_texto(monkeypatch):
     monkeypatch.setattr(servidor.cerebro_profundo, "resultados_pendientes", list)
     assert servidor.con_novedades("Hola.") == "Hola."
+
+
+def test_al_salir_aprende_de_la_conversacion_en_segundo_plano(cerebro, monkeypatch):
+    recibido = []
+    monkeypatch.setattr(servidor.aprendizaje, "resumir_sesion", lambda historial, llamar: recibido.append((historial, llamar)))
+    enviar(cerebro, intent("AMAZON.StopIntent"))
+    assert recibido == [([{"role": "user", "content": "hola"}], cerebro.completar)]
+
+
+LARGA = " ".join(f"Frase número {i} con varias palabras para contar." for i in range(1, 21))
+
+
+class CerebroLargo(CerebroFalso):
+    def responder(self, sesion_id, texto):
+        self.recibido.append((sesion_id, texto))
+        return LARGA
+
+
+@pytest.fixture
+def largo(monkeypatch):
+    monkeypatch.setattr(servidor.aprendizaje, "resumir_sesion", lambda historial, llamar: None)
+    cerebro = CerebroLargo()
+    cliente = servidor.crear_app(cerebro, verificar=False).test_client()
+    return cerebro, lambda peticion: cliente.post("/alexa", json=sobre(peticion)).get_json()["response"]
+
+
+def test_respuesta_larga_dice_una_parte_y_pregunta_si_sigue(largo):
+    cerebro, turno = largo
+    primera = voz(turno(conversar("cuéntame una historia")))
+    assert primera.endswith(f"{servidor.PREGUNTA_SIGO}</speak>")
+    assert "Frase número 1 " in primera and "Frase número 20" not in primera
+
+    dichas = [primera]
+    respuesta = turno(conversar("Sí, sigue."))
+    dichas.append(voz(respuesta))
+    while servidor.PREGUNTA_SIGO in dichas[-1]:
+        dichas.append(voz(turno(conversar("sí"))))
+    assert "Frase número 20 con varias palabras para contar." in dichas[-1]
+    assert cerebro.recibido == [("sesion-1", "cuéntame una historia")]
+    todo = " ".join(dichas)
+    assert all(f"Frase número {i} con" in todo for i in range(1, 21))
+
+
+def test_no_corta_la_lectura_y_otra_pregunta_descarta_el_resto(largo):
+    cerebro, turno = largo
+    turno(conversar("cuéntame una historia"))
+    assert servidor.VALE in voz(turno(conversar("no, gracias")))
+    turno(conversar("cuéntame otra"))
+    turno(conversar("¿qué hora es?"))
+    assert [texto for _, texto in cerebro.recibido] == ["cuéntame una historia", "cuéntame otra", "¿qué hora es?"]
+
+
+def test_respuesta_corta_no_pregunta_si_sigue(cerebro):
+    respuesta = enviar(cerebro, conversar("hola"))
+    assert servidor.PREGUNTA_SIGO not in voz(respuesta)
+
+
+def test_al_salir_vuelve_a_hablar_normal(cerebro, monkeypatch):
+    restablecidas = []
+    monkeypatch.setattr(servidor.personas, "restablecer", lambda: restablecidas.append(True))
+    monkeypatch.setattr(servidor.aprendizaje, "resumir_sesion", lambda historial, llamar: None)
+    enviar(cerebro, intent("AMAZON.StopIntent"))
+    assert restablecidas == [True]

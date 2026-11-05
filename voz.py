@@ -2,6 +2,8 @@ import re
 import xml.etree.ElementTree as ET
 from xml.sax.saxutils import escape
 
+from acciones.personas import idiomas_a_ssml, quitar_idiomas
+
 # Speechcons que existen igual en es-ES, es-MX y es-US (referencia de speechcons de Alexa):
 # así suenan bien sea cual sea el idioma del Echo. Otra palabra entre llaves se lee normal.
 INTERJECCIONES = (
@@ -13,16 +15,46 @@ PAUSA = re.compile(r"(?:\.{3}|…)+")
 PAUSA_SSML = '<break time="400ms"/>'
 # Alexa no admite más de 10 s de silencio por respuesta.
 MAX_PAUSAS = 20
-ETIQUETAS = {"speak", "say-as", "break"}
+ETIQUETAS = {"speak", "say-as", "break", "lang"}
 # Alexa rechaza la respuesta entera si el SSML pasa de 8000 caracteres, contando <speak></speak>.
 MAX_SSML = 8000 - len("<speak></speak>")
 # Caracteres de control y emojis: Alexa rechaza la respuesta si no puede pronunciarlos.
 NO_PRONUNCIABLE = re.compile("[\x00-\x08\x0b\x0c\x0e-\x1f️☀-➿\U0001f000-\U0001faff]")
 
 
+# Alexa habla unas 150 palabras por minuto: 55 son ~20 s, lo que se escucha cómodo de una vez. Si solo sobra
+# un poco, mejor decirlo entero que preguntar "¿sigo?" por una frase.
+PALABRAS_POR_TURNO = 55
+TOLERANCIA = 15
+FIN_FRASE = re.compile(r"(?<=[.!?…])\s")
+FIN_INCISO = re.compile(r"(?<=[,;:])\s")
+
+
+def _corte(texto: str, limite: int) -> int:
+    """Dónde cortar sin pasar de `limite` caracteres: fin de frase, si no de inciso, si no entre palabras."""
+    minimo = limite // 3
+    for separador in (FIN_FRASE, FIN_INCISO):
+        cortes = [m.start() for m in separador.finditer(texto, 0, limite + 1) if m.start() >= minimo]
+        if cortes:
+            return cortes[-1]
+    # Nunca dentro de una {interjección}: quedaría una llave suelta en la voz.
+    espacios = [i for i, letra in enumerate(texto[:limite + 1]) if letra == " " and texto[:i].count("{") == texto[:i].count("}")]
+    return espacios[-1] if espacios else limite
+
+
+def partir(texto: str) -> tuple[str, str]:
+    """(lo que se dice ahora, lo que queda para después de "¿sigo?"); el resto vacío si cabe todo."""
+    palabras = texto.split()
+    if len(palabras) <= PALABRAS_POR_TURNO + TOLERANCIA:
+        return texto.strip(), ""
+    texto = " ".join(palabras)
+    corte = _corte(texto, len(" ".join(palabras[:PALABRAS_POR_TURNO])))
+    return texto[:corte].strip(), texto[corte:].strip()
+
+
 def texto_plano(texto: str) -> str:
     """El texto sin marcas de voz, para mostrarlo en pantalla."""
-    return INTERJECCION.sub(r"\1\2", NO_PRONUNCIABLE.sub("", texto))
+    return quitar_idiomas(INTERJECCION.sub(r"\1\2", NO_PRONUNCIABLE.sub("", texto)))
 
 
 def _interjeccion(coincidencia: re.Match) -> str:
@@ -44,7 +76,7 @@ def _es_valido(ssml: str) -> bool:
 
 def _convertir(texto: str) -> str:
     ssml = PAUSA.sub(PAUSA_SSML, escape(NO_PRONUNCIABLE.sub("", texto)))
-    ssml = INTERJECCION.sub(_interjeccion, ssml)
+    ssml = idiomas_a_ssml(INTERJECCION.sub(_interjeccion, ssml))
     return ssml if _es_valido(ssml) else escape(texto_plano(texto))
 
 

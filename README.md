@@ -143,6 +143,20 @@ Ejemplos de lo que puedes decir:
   "Léeme mis últimos correos". Solo lee: no puede enviar ni borrar.
 - **Pantalla**: "¿Qué hay en mi pantalla?" · "¿Qué error sale aquí?" ·
   "Vigila mi pantalla diez minutos" · "Deja de vigilar"
+- **Resumen del día**: "Buenos días" · "Mi resumen" · "¿Qué hay hoy?" (fecha, clima, citas, avisos y
+  titulares, sin esperar a la IA). Para oírlo cada mañana sin abrir la skill, crea en la app de Alexa una
+  rutina (*Más → Rutinas → +*): cuando digas "Alexa, buenos días" (o a una hora), acción *Personalizada*
+  con el texto **"pide a mi jarvis mi resumen del día"**.
+- **Tareas programadas**: "Avísame todos los días a las 7 de tomar la pastilla" · "Cada lunes a las 9 hazme
+  un resumen" · "¿Qué tengo programado?" · "Borra el aviso de la pastilla".
+- **Portapapeles**: copia un texto y di "tradúceme lo que copié" o "resume lo que copié"; "cópialo" deja la
+  respuesta en el portapapeles. Lo copiado **se envía a la IA** (Groq o Gemini) para entenderlo: no lo uses
+  con contraseñas ni datos privados.
+- **Cálculos**: "¿Cuánto es el 15 % de 200?" · "Convierte 10 kilómetros a millas" · "350 grados Fahrenheit
+  en Celsius". Las cuentas se hacen exactas en tu PC, no de cabeza.
+
+**Respuestas largas ("¿Sigo?")**: Jarvis dice como mucho unas 55 palabras de una vez; si hay más, pregunta
+*"¿Sigo?"*. Di "sí" o "sigue" para oír el resto, o pregunta otra cosa.
 
 **Respuestas lentas ("y bien")**: Alexa solo espera unos 8 segundos. Si algo tarda más (buscar
 en internet, redactar un Word, mirar la pantalla), Jarvis dice *"Sigo con eso, dime 'y bien' en
@@ -338,8 +352,27 @@ Lo que pasa desde que terminas de hablar hasta que Alexa empieza a contestar:
 - **Razonamiento bajo**: `gpt-oss` piensa antes de contestar; en "low" la primera palabra llega en
   ~1,1 s frente a ~4,7 s en "high" (medición pública de Artificial Analysis para Groq).
 - **Caché de Groq**: las instrucciones y las funciones van siempre iguales y al principio; la hora y lo que
-  sabe de ti van al final. Así Groq reutiliza lo repetido: contesta antes y esos tokens no cuentan en su
-  límite de 8.000 por minuto.
+  sabe de ti van al final. Así Groq reutiliza lo repetido: contesta antes y esos tokens no cuentan en sus
+  límites (Groq no garantiza que siempre acierte).
+- **Respuestas largas**: Jarvis dice como mucho unas 55 palabras (~20 s) de una vez, cortando al final de
+  una frase, y pregunta "¿Sigo?". Di "sí" o "sigue" para oír el resto; "no" o cualquier otra pregunta lo
+  descarta.
+
+### Cuánto da el plan gratis
+
+Groq gratis da, **por modelo**, 30 peticiones/min, 1.000/día, 8.000 tokens/min y 200.000 tokens/día. Jarvis
+usa dos modelos de Groq (`gpt-oss-120b` y, si se agota, `gpt-oss-20b`, cada uno con su cuota) y luego Gemini.
+Tras un "límite alcanzado" (429) se salta ese modelo el tiempo que Groq indica, sin perder tiempo en
+reintentos. Cifras aproximadas por conversación con la IA (las órdenes de la ruta rápida no gastan nada):
+
+| | Tokens que cuentan | Seguidas por minuto (Groq) | Al día (Groq) |
+|---|---|---|---|
+| 1.1.0 (dos llamadas por orden, historial sin tope) | ~7.500 | ~1 (la 2.ª ya pasaba a Gemini) | ~27 |
+| Ahora (71 funciones), si Groq no usa la caché | ~6.300 | ~2,5 (dos modelos) | ~65 |
+| Ahora, con la caché (lo normal al repetir) | ~800 | ~20 (tope de 30 peticiones) | ~500 |
+
+Encima de eso quedan Gemini (unas 500 al día gratis en flash-lite, más lento) y la ruta rápida, sin límite.
+`scripts/medir_latencia.py` muestra los tokens reales de cada llamada en tu PC.
 - **Mídelo en tu PC**: `.venv\Scripts\python scripts\medir_latencia.py` hace 5 veces una orden directa, una
   orden con IA y una pregunta, con tus claves, y muestra la mediana y el p90 (las acciones se simulan: no
   toca tu PC). En la ventana de Jarvis cada petición dice cuánto tardó la IA, cuántos tokens fueron a la
@@ -388,10 +421,10 @@ Lo que pasa desde que terminas de hablar hasta que Alexa empieza a contestar:
   límite gratis del minuto; espera un poco y repite. Pon las dos claves para que use la otra.
 - **No pausa ni cambia de canción**: actúa sobre lo que esté sonando en el PC; si no suena
   nada, no pasa nada.
-- **Groq dice que llegaste al límite (429)**: cada consulta a la IA envía unos 4.600 tokens y el plan gratis
-  de Groq da 8.000 por minuto. La parte repetida suele ir a su caché (no cuenta) y las órdenes frecuentes no
-  usan la IA, pero si conversas mucho seguido Jarvis pasa solo a Gemini (algo más lento). Es normal; en la
-  ventana de Jarvis verás "LLM ... falló: RateLimitError".
+- **Groq dice que llegaste al límite (429)**: cada consulta a la IA envía unos 6.000 tokens y el plan gratis
+  de Groq da 8.000 por minuto por modelo. La parte repetida suele ir a su caché (no cuenta) y las órdenes
+  frecuentes no usan la IA, pero si conversas mucho seguido Jarvis pasa solo a `gpt-oss-20b` y luego a
+  Gemini (algo más lento). Es normal; en la ventana de Jarvis verás "LLM ... falló: RateLimitError".
 - **Cambiaste `requirements.txt`** o falla la instalación: borra la carpeta `.venv` y abre
   `iniciar.bat` otra vez.
 

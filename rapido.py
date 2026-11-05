@@ -214,6 +214,8 @@ REGLAS = [(re.compile(patron), regla) for patron, regla in [
     (r"(?:que hora es|que horas son|dime la hora|la hora|me dices la hora)(?: ahora)?", _fija("decir_hora")),
     (r"que (?:dia|fecha) es(?: hoy)?|a que (?:dia|fecha) estamos(?: hoy)?|a cuanto estamos(?: hoy)?"
      r"|dime la fecha|la fecha de hoy|que dia de la semana es(?: hoy)?", _fija("decir_fecha")),
+    (r"buenos dias|(?:dame |dime )?(?:mi resumen|(?:el |mi )?resumen (?:del dia|de hoy))(?: del dia)?|que hay (?:para )?hoy",
+     _fija("resumen_del_dia")),
     (rf"pausa|pausalo|pausala|pon pausa|ponle pausa|(?:pausa|para|deten) {MEDIA}", _fija("pausar_reanudar")),
     (rf"reanuda|reanudalo|reanudala|play|dale play|dale a play|quita la pausa|quitale la pausa"
      rf"|(?:reanuda|continua|sigue con) {MEDIA}", _fija("pausar_reanudar")),

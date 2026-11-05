@@ -16,7 +16,8 @@ from flask_ask_sdk.skill_adapter import (
 import cerebro_profundo
 import panel
 import voz
-from acciones import memoria, vigilancia
+from acciones import aprendizaje, calculo, memoria, personas, vigilancia
+from acciones.programas import normalizar
 from acciones.recordatorios import iniciar_vigilante
 from cerebro import Cerebro
 from config import ALEXA_SKILL_ID
@@ -45,6 +46,13 @@ REPREGUNTAS = [
 SIGO_PENSANDO = "Sigo con eso, dime 'y bien' en unos segundos."
 PIDE_RESULTADO = "Di 'y bien' y te cuento."
 SEGUIMIENTOS = {"y bien", "ya", "dime", "entonces", "y entonces", "y qué", "qué pasó", "listo"}
+PREGUNTA_SIGO = "¿Sigo?"
+SIGUE = {
+    "si", "sigue", "continua", "si sigue", "si continua", "si por favor", "sigue por favor", "dale", "adelante",
+    "claro", "si claro", "vale", "ok", "cuentame mas", "mas", "y que mas", "termina",
+}
+BASTA = {"no", "no gracias", "basta", "es suficiente", "suficiente", "asi esta bien", "ya esta bien"}
+VALE = "Vale. ¿Algo más?"
 
 # Alexa corta a los ~8 s contando el viaje por ngrok: pasado este tiempo se responde en dos pasos. Bajarlo no
 # acelera nada (solo haría decir "y bien" más a menudo) y con la ruta rápida y gpt-oss en "low" casi nunca se llega.
@@ -81,11 +89,17 @@ def es_seguimiento(texto: str) -> bool:
     return texto.lower().strip(" ¿?¡!.,") in SEGUIMIENTOS
 
 
+def _frase(texto: str) -> str:
+    return normalizar(texto.replace(",", " ")).strip(" ¿?¡!.")
+
+
 def crear_app(cerebro, verificar=True):
     sb = SkillBuilder()
     sb.skill_id = ALEXA_SKILL_ID
     hilos = ThreadPoolExecutor(max_workers=4)
     pendientes = {}
+    # Lo que falta por decir de una respuesta larga, hasta que el usuario diga "sí" a "¿sigo?".
+    por_decir = {}
 
     def encadenar(previa, sesion, texto):
         return f"{previa.result()} {cerebro.responder(sesion, texto)}"
@@ -109,19 +123,26 @@ def crear_app(cerebro, verificar=True):
         return handler_input.request_envelope.session.session_id
 
     def terminar(handler_input):
-        pendientes.pop(sesion_id(handler_input), None)
-        cerebro.olvidar(sesion_id(handler_input))
+        sesion = sesion_id(handler_input)
+        pendientes.pop(sesion, None)
+        por_decir.pop(sesion, None)
+        personas.restablecer()
+        # Aprende de la conversación en segundo plano (una llamada al LLM); no retrasa la despedida.
+        aprendizaje.resumir_sesion(cerebro.olvidar(sesion), cerebro.completar)
         panel.emitir("espera")
         # Mientras vigila la pantalla, el HUD es donde salen los comentarios: no se esconde.
         if not vigilancia.vigilando():
             panel.ocultar_luego()
 
     def conversar(handler_input, texto):
-        texto = con_novedades(texto)
-        panel.emitir("respuesta", voz.texto_plano(texto))
+        dicho, resto = voz.partir(con_novedades(texto))
+        if resto:
+            por_decir[sesion_id(handler_input)] = resto
+            dicho = f"{dicho} {PREGUNTA_SIGO}"
+        panel.emitir("respuesta", voz.texto_plano(dicho))
         return (
-            handler_input.response_builder.speak(voz.a_ssml(texto))
-            .ask(repregunta())
+            handler_input.response_builder.speak(voz.a_ssml(dicho))
+            .ask(PREGUNTA_SIGO if resto else repregunta())
             .response
         )
 
@@ -141,6 +162,11 @@ def crear_app(cerebro, verificar=True):
         # Una petición directa ("pide a mi jarvis que...") llega sin LaunchRequest.
         panel.mostrar()
         panel.emitir("usuario", texto)
+        resto = por_decir.pop(sesion_id(handler_input), None)
+        if resto and _frase(texto) in SIGUE:
+            return conversar(handler_input, resto)
+        if resto and _frase(texto) in BASTA:
+            return conversar(handler_input, VALE)
         inicio = time.perf_counter()
         respuesta = pensar(sesion_id(handler_input), texto)
         registro.info(
@@ -200,4 +226,5 @@ if __name__ == "__main__":
     if not cerebro.clientes:
         raise SystemExit("Falta GROQ_API_KEY o GEMINI_API_KEY en el archivo .env")
     iniciar_vigilante()
+    calculo.precargar()
     crear_app(cerebro).run(port=5000)

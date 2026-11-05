@@ -9,7 +9,7 @@ import openai
 
 import config
 import panel
-from acciones import memoria, recordatorios
+from acciones import aprendizaje, recordatorios
 from rapido import DIAS
 
 MAX_RONDAS = 10
@@ -30,7 +30,7 @@ EMPEZADA = "Me pongo con eso, te aviso cuando termine."
 # el mouse: actuaría sobre lo que haya en pantalla en ese momento, quizá mientras el usuario trabaja.
 EXCLUIDAS = {
     "encargar_tarea", "estado_tareas", "apagar", "reiniciar", "suspender", "bloquear",
-    "mover_mouse", "desplazar", "hacer_clic", "clic_en", "programar_tarea",
+    "mover_mouse", "desplazar", "hacer_clic", "clic_en", "programar_tarea", "olvidar_todo",
 }
 
 registro = logging.getLogger(__name__)
@@ -85,8 +85,8 @@ def _ejecutar(nombre: str, argumentos: str | None, tras_lectura: bool) -> str:
     return herramientas.ejecutar(nombre, datos if isinstance(datos, dict) else {})
 
 
-def prompt_sistema(ahora: datetime, datos_usuario: list[str]) -> str:
-    sabido = "; ".join(datos_usuario) or "nada todavía"
+def prompt_sistema(ahora: datetime, sabido: str) -> str:
+    sabido = sabido or "nada todavía"
     return (
         "Eres Jarvis trabajando en segundo plano en un encargo del usuario. Resuélvelo en varios pasos con las "
         "herramientas: busca información, compara y redacta. Si pide un documento, créalo con crear_documento; "
@@ -127,7 +127,7 @@ def _resolver(tarea: Tarea, clientes: list[tuple]) -> str:
 
     limite = time.monotonic() + TIEMPO_MAXIMO
     mensajes = [
-        {"role": "system", "content": prompt_sistema(datetime.now(), memoria.datos_guardados())},
+        {"role": "system", "content": prompt_sistema(datetime.now(), aprendizaje.contexto())},
         {"role": "user", "content": tarea.descripcion},
     ]
     leido = False

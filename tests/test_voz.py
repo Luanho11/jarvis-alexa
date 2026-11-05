@@ -63,3 +63,43 @@ def test_respuestas_largas_se_cortan_bajo_el_limite_de_alexa(texto):
     ssml = voz.a_ssml(texto)
     assert len(f"<speak>{ssml}</speak>") <= 8000
     assert es_ssml_valido(ssml)
+
+
+def test_partir_deja_entera_una_respuesta_normal():
+    texto = "Claro. " * 40
+    assert voz.partir(texto) == (texto.strip(), "")
+
+
+def test_partir_corta_al_final_de_una_frase_sin_perder_nada():
+    frases = [f"Esta es la frase {i} de la explicación." for i in range(1, 15)]
+    dicho, resto = voz.partir(" ".join(frases))
+    assert dicho.endswith(".") and resto[0].isupper()
+    assert len(dicho.split()) <= voz.PALABRAS_POR_TURNO
+    assert f"{dicho} {resto}" == " ".join(frases)
+
+
+def test_partir_una_frase_enorme_corta_en_una_coma_o_entre_palabras():
+    con_comas = ", ".join(f"punto {i} importante" for i in range(40)) + "."
+    dicho, resto = voz.partir(con_comas)
+    assert dicho.endswith(",") and f"{dicho} {resto}" == con_comas
+    sin_pausas = " ".join(f"palabra{i}" for i in range(100))
+    dicho, resto = voz.partir(sin_pausas)
+    assert len(dicho.split()) == voz.PALABRAS_POR_TURNO and f"{dicho} {resto}" == sin_pausas
+
+
+def test_partir_no_corta_dentro_de_una_interjeccion():
+    texto = " ".join(["uno"] * 54) + " {ay ay ay} " + " ".join(["dos"] * 30)
+    dicho, _ = voz.partir(texto)
+    assert dicho.count("{") == dicho.count("}")
+
+
+def test_frases_en_ingles_con_su_voz_y_limpias_en_pantalla():
+    ssml = voz.a_ssml("Se dice [en]good morning[/en], ¿vale?")
+    assert '<lang xml:lang="en-US">good morning</lang>' in ssml
+    assert es_ssml_valido(ssml)
+    assert voz.texto_plano("Se dice [en]good morning[/en].") == "Se dice good morning."
+
+
+def test_marca_de_idioma_suelta_no_rompe_el_ssml():
+    ssml = voz.a_ssml("hola [en]sin cerrar & más")
+    assert "[en]" not in ssml and es_ssml_valido(ssml)

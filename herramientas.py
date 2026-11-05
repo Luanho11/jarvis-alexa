@@ -3,15 +3,22 @@ import logging
 import cerebro_profundo
 from acciones import (
     agenda,
+    aprendizaje,
     archivos,
+    calculo,
     documentos,
+    google,
     info,
+    lectura,
     memoria,
     mouse,
     notas,
     pc,
+    portapapeles,
+    programadas,
     programas,
     recordatorios,
+    resumen,
     rutinas,
     sistema,
     vigilancia,
@@ -93,8 +100,15 @@ HERRAMIENTAS = [
     ),
     _herramienta("listar_eventos", "Eventos de un día o, sin fecha, los próximos.", {"fecha": _parametro("string", "YYYY-MM-DD")}),
     _herramienta("borrar_evento", "Borra un evento por su título.", {"titulo": TEXTO}, ("titulo",)),
-    _herramienta("recordar", "Guarda un dato duradero del usuario.", {"dato": _parametro("string", "Una frase.")}, ("dato",)),
+    _herramienta(
+        "recordar",
+        "Guarda un dato duradero del usuario.",
+        {"dato": _parametro("string", "Una frase."), "categoria": {"type": "string", "enum": list(memoria.CATEGORIAS)}},
+        ("dato",),
+    ),
     _herramienta("olvidar_dato", "Borra un dato guardado del usuario.", {"dato": TEXTO}, ("dato",)),
+    _herramienta("que_sabes_de_mi", "Lo que sabes del usuario, para contárselo."),
+    _herramienta("olvidar_todo", "Borra todo lo que sabes del usuario si lo confirma diciendo: sí, bórralo todo."),
     _herramienta("buscar_informacion", "Busca en internet información actual para responder.", {"pregunta": TEXTO}, ("pregunta",)),
     _herramienta("noticias", "Titulares de noticias recientes.", {"tema": _parametro("string", "Vacío: generales.")}),
     _herramienta(
@@ -104,7 +118,12 @@ HERRAMIENTAS = [
         ("cantidad", "de", "a"),
     ),
     _herramienta("describir_pantalla", "Mira la pantalla del PC y responde sobre ella.", {"pregunta": TEXTO}),
-    _herramienta("activar_modo", "Activa un modo o rutina (trabajo, estudio, relax...).", {"nombre": TEXTO}, ("nombre",)),
+    _herramienta(
+        "activar_modo",
+        "Activa un modo: rutina (trabajo, estudio) o forma de hablar (profesor, traductor, xara...).",
+        {"nombre": TEXTO},
+        ("nombre",),
+    ),
     _herramienta("listar_modos", "Dice los modos disponibles."),
     _herramienta(
         "crear_documento",
@@ -149,15 +168,53 @@ HERRAMIENTAS = [
     ),
     _herramienta("buscar_notas", "Busca en las notas del usuario.", {"consulta": _parametro("string")}, ("consulta",)),
     _herramienta("leer_nota", "Lee una nota del usuario.", {"titulo": _parametro("string")}, ("titulo",)),
+    _herramienta(
+        "leer_documento",
+        "Lee un PDF, Word, texto o web.",
+        {"origen": _parametro("string", "Ruta, nombre de archivo o URL."), "pagina_inicial": _parametro("integer")},
+        ("origen",),
+    ),
+    _herramienta("resumen_del_dia", "Resumen de hoy: clima, citas, avisos y titulares."),
+    _herramienta(
+        "programar_tarea",
+        "Programa un aviso, resumen o encargo recurrente.",
+        {
+            "que": TEXTO,
+            "hora": _parametro("string", "HH:MM"),
+            "dias": _parametro("string", "todos, laborables, fines, 'lunes,miércoles' o AAAA-MM-DD."),
+            "tipo": {"type": "string", "enum": list(programadas.TIPOS)},
+        },
+        ("que", "hora"),
+    ),
+    _herramienta("listar_programadas", "Dice las tareas programadas."),
+    _herramienta("borrar_programada", "Borra una tarea programada.", {"que": TEXTO}, ("que",)),
+    _herramienta("leer_portapapeles", "Texto copiado por el usuario."),
+    _herramienta("copiar_al_portapapeles", "Copia texto al portapapeles.", {"texto": TEXTO}, ("texto",)),
+    _herramienta("calcular", "Calcula exacto. Sintaxis Python: 15% de 200 → 200*15/100.", {"expresion": TEXTO}, ("expresion",)),
+    _herramienta(
+        "convertir_unidad",
+        "Convierte unidades (km, millas, °C, °F, kg, libras, litros, tazas...).",
+        {"cantidad": _parametro("number"), "de": TEXTO, "a": TEXTO},
+        ("cantidad", "de", "a"),
+    ),
+    _herramienta(
+        "leer_correos",
+        "Lee correos de Gmail (sin leer por defecto).",
+        {"cantidad": _parametro("integer", "Por defecto 5."), "solo_no_leidos": _parametro("boolean")},
+    ),
 ]
 
 # Devuelven texto de terceros (internet, pantalla, notas) que puede esconder órdenes para el LLM.
-LECTURA = {"buscar_informacion", "noticias", "describir_pantalla", "leer_nota", "buscar_notas", "estado_tareas"}
+LECTURA = {
+    "buscar_informacion", "noticias", "describir_pantalla", "leer_nota", "buscar_notas", "estado_tareas",
+    "leer_documento", "leer_correos", "resumen_del_dia", "leer_portapapeles",
+}
 # Tras una lectura, en la misma petición estas no se ejecutan: actúan sobre el PC o la memoria y una orden
 # inyectada las usaría sin que el usuario lo pida. Si el usuario las pide en su siguiente frase, sí se ejecutan.
 PELIGROSAS = {
     "escribir_texto", "atajo_teclado", "cerrar_programa", "cerrar_ventana", "apagar", "reiniciar", "suspender",
-    "bloquear", "recordar", "olvidar_dato", "borrar_evento", "encargar_tarea", "hacer_clic", "clic_en",
+    "bloquear", "recordar", "olvidar_dato", "olvidar_todo", "borrar_evento", "programar_tarea", "borrar_programada",
+    "encargar_tarea", "hacer_clic", "clic_en",
 }
 # Acciones cuyo texto ya se puede decir tal cual ("Subí el volumen."): si el LLM solo llama a estas para una
 # orden simple, se responde con ese texto sin una segunda llamada. Las que traen datos para que el LLM los
@@ -170,7 +227,8 @@ DIRECTAS = {
     "mover_mouse", "desplazar", "hacer_clic", "clic_en", "poner_temporizador", "agregar_evento", "borrar_evento",
     "recordar", "olvidar_dato", "activar_modo", "crear_documento", "dictar", "abrir_carpeta", "buscar_archivo",
     "minimizar_todo", "enfocar_ventana", "cerrar_ventana", "maximizar_ventana", "vigilar_pantalla",
-    "dejar_de_vigilar", "encargar_tarea", "guardar_nota",
+    "dejar_de_vigilar", "encargar_tarea", "guardar_nota", "programar_tarea", "borrar_programada",
+    "copiar_al_portapapeles", "calcular", "convertir_unidad",
 }
 BLOQUEADA = "Por seguridad no hago esto justo después de leer internet, la pantalla o las notas. Pide al usuario que lo confirme."
 
@@ -210,6 +268,8 @@ FUNCIONES = {
     "poner_temporizador": recordatorios.poner_temporizador,
     "recordar": memoria.recordar,
     "olvidar_dato": memoria.olvidar_dato,
+    "que_sabes_de_mi": aprendizaje.que_sabes_de_mi,
+    "olvidar_todo": aprendizaje.olvidar_todo,
     "buscar_informacion": info.buscar_informacion,
     "noticias": info.noticias,
     "convertir_moneda": info.convertir_moneda,
@@ -231,6 +291,16 @@ FUNCIONES = {
     "guardar_nota": notas.guardar_nota,
     "buscar_notas": notas.buscar_notas,
     "leer_nota": notas.leer_nota,
+    "leer_documento": lectura.leer_documento,
+    "leer_correos": google.leer_correos,
+    "resumen_del_dia": resumen.resumen_del_dia,
+    "programar_tarea": programadas.programar_tarea,
+    "listar_programadas": programadas.listar_programadas,
+    "borrar_programada": programadas.borrar_programada,
+    "leer_portapapeles": portapapeles.leer_portapapeles,
+    "copiar_al_portapapeles": portapapeles.copiar_al_portapapeles,
+    "calcular": calculo.calcular,
+    "convertir_unidad": calculo.convertir_unidad,
     "agregar_evento": agenda.agregar_evento,
     "listar_eventos": agenda.listar_eventos,
     "borrar_evento": agenda.borrar_evento,
