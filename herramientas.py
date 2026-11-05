@@ -159,6 +159,19 @@ PELIGROSAS = {
     "escribir_texto", "atajo_teclado", "cerrar_programa", "cerrar_ventana", "apagar", "reiniciar", "suspender",
     "bloquear", "recordar", "olvidar_dato", "borrar_evento", "encargar_tarea", "hacer_clic", "clic_en",
 }
+# Acciones cuyo texto ya se puede decir tal cual ("Subí el volumen."): si el LLM solo llama a estas para una
+# orden simple, se responde con ese texto sin una segunda llamada. Las que traen datos para que el LLM los
+# explique (lectura, clima, agenda, estado...) no están.
+DIRECTAS = {
+    "subir_volumen", "bajar_volumen", "fijar_volumen", "silenciar", "pausar_reanudar", "siguiente", "anterior",
+    "abrir_youtube", "reproducir_en_youtube", "abrir_web", "abrir_programa", "cerrar_programa", "pantalla_completa",
+    "adelantar", "retroceder", "siguiente_video", "buscar_en_google", "abrir_en_spotify", "apagar", "reiniciar",
+    "cancelar_apagado", "suspender", "bloquear", "captura_pantalla", "escribir_texto", "atajo_teclado",
+    "mover_mouse", "desplazar", "hacer_clic", "clic_en", "poner_temporizador", "agregar_evento", "borrar_evento",
+    "recordar", "olvidar_dato", "activar_modo", "crear_documento", "dictar", "abrir_carpeta", "buscar_archivo",
+    "minimizar_todo", "enfocar_ventana", "cerrar_ventana", "maximizar_ventana", "vigilar_pantalla",
+    "dejar_de_vigilar", "encargar_tarea", "guardar_nota",
+}
 BLOQUEADA = "Por seguridad no hago esto justo después de leer internet, la pantalla o las notas. Pide al usuario que lo confirme."
 
 FUNCIONES = {

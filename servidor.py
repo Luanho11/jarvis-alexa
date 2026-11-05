@@ -1,5 +1,6 @@
 import logging
 import random
+import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
@@ -45,7 +46,8 @@ SIGO_PENSANDO = "Sigo con eso, dime 'y bien' en unos segundos."
 PIDE_RESULTADO = "Di 'y bien' y te cuento."
 SEGUIMIENTOS = {"y bien", "ya", "dime", "entonces", "y entonces", "y qué", "qué pasó", "listo"}
 
-# Alexa corta a los ~8 s: pasado este tiempo se responde en dos pasos.
+# Alexa corta a los ~8 s contando el viaje por ngrok: pasado este tiempo se responde en dos pasos. Bajarlo no
+# acelera nada (solo haría decir "y bien" más a menudo) y con la ruta rápida y gpt-oss en "low" casi nunca se llega.
 ESPERA_RESPUESTA = 6.5
 
 registro = logging.getLogger(__name__)
@@ -139,7 +141,12 @@ def crear_app(cerebro, verificar=True):
         # Una petición directa ("pide a mi jarvis que...") llega sin LaunchRequest.
         panel.mostrar()
         panel.emitir("usuario", texto)
+        inicio = time.perf_counter()
         respuesta = pensar(sesion_id(handler_input), texto)
+        registro.info(
+            "Alexa: %s en %.0f ms", "sigue pensando" if respuesta is None else "respuesta",
+            (time.perf_counter() - inicio) * 1000,
+        )
         if respuesta is None:
             return handler_input.response_builder.speak(SIGO_PENSANDO).ask(PIDE_RESULTADO).response
         return conversar(handler_input, respuesta)

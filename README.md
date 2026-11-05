@@ -239,6 +239,41 @@ conversación se minimiza a los pocos segundos y la siguiente vez vuelve a apare
 - La onda animada es [SiriWave](https://github.com/kopiro/siriwave) de Flavio De Stefano
   (licencia MIT, ver `hud/NOTICE`); el resto del diseño es propio.
 
+## Velocidad
+
+Lo que pasa desde que terminas de hablar hasta que Alexa empieza a contestar:
+
+| Paso | Tiempo aproximado | ¿Lo controla Jarvis? |
+|---|---|---|
+| Alexa reconoce tu voz y manda el texto | 0,5–1 s | No |
+| Viaje por ngrok (ida y vuelta) | 0,1–0,3 s | No |
+| Servidor de Jarvis (decidir y preparar la voz) | ~1 ms (medido; la firma de Alexa suma unos ms) | Sí |
+| Ruta rápida: reconocer una orden frecuente | ~0,01 ms (medido) | Sí |
+| IA (Groq `gpt-oss-120b` con razonamiento bajo) | ~1 s por llamada | En parte |
+| Alexa empieza a leer la respuesta | 0,5–1 s | No |
+
+- **Órdenes frecuentes sin IA** (ruta rápida): pausa/play, siguiente/anterior, subir/bajar/silenciar
+  el volumen y "volumen al 30", "pon (música de) X" / "reproduce X", "abre" (programas, webs y carpetas
+  conocidas), "cierra" (programas conocidos, la ventana), pantalla completa, adelantar/retroceder,
+  clic, doble clic, "haz clic en X", subir/bajar la página, mover el mouse, apagar/reiniciar/cancelar,
+  captura, minimizar, bloquear, suspender, y la hora y la fecha. Responden en lo que tarda la propia
+  acción (casi nada; "pon X" espera a YouTube, ~0,5 s). Si la frase tiene dos órdenes ("y", "luego",
+  comas), una pregunta o un matiz, la decide la IA: es más lenta pero no se equivoca de orden.
+- **Órdenes con IA**: una sola llamada. Si la IA solo usó acciones ("pon un temporizador de cinco
+  minutos"), Jarvis dice el resultado de la acción sin preguntarle otra vez. Conversar o buscar
+  información también es una llamada (dos si busca en internet).
+- **Razonamiento bajo**: `gpt-oss` piensa antes de contestar; en "low" la primera palabra llega en
+  ~1,1 s frente a ~4,7 s en "high" (medición pública de Artificial Analysis para Groq).
+- **Caché de Groq**: las instrucciones y las funciones van siempre iguales y al principio; la hora y lo que
+  sabe de ti van al final. Así Groq reutiliza lo repetido: contesta antes y esos tokens no cuentan en su
+  límite de 8.000 por minuto.
+- **Mídelo en tu PC**: `.venv\Scripts\python scripts\medir_latencia.py` hace 5 veces una orden directa, una
+  orden con IA y una pregunta, con tus claves, y muestra la mediana y el p90 (las acciones se simulan: no
+  toca tu PC). En la ventana de Jarvis cada petición dice cuánto tardó la IA, cuántos tokens fueron a la
+  caché y cuánto las acciones; el HUD lo muestra en pequeño abajo.
+- Si una respuesta pasa de 6,5 s (Groq saturado y Gemini lento), Alexa dice "dime 'y bien'" para no
+  cortarse a los 8 s.
+
 ## Limitaciones
 
 - **Aún no se ha probado en un Windows real**: está probado con pruebas automáticas, pero la
@@ -280,9 +315,10 @@ conversación se minimiza a los pocos segundos y la siguiente vez vuelve a apare
   límite gratis del minuto; espera un poco y repite. Pon las dos claves para que use la otra.
 - **No pausa ni cambia de canción**: actúa sobre lo que esté sonando en el PC; si no suena
   nada, no pasa nada.
-- **Groq dice que llegaste al límite (429)**: cada consulta con todas las funciones gasta unos 4.600
-  tokens y el plan gratis de Groq da 8.000 por minuto, así que con dos órdenes seguidas Jarvis pasa solo a
-  Gemini. Es normal; si molesta, pon `PROVEEDOR_LLM=gemini` en `.env`.
+- **Groq dice que llegaste al límite (429)**: cada consulta a la IA envía unos 4.600 tokens y el plan gratis
+  de Groq da 8.000 por minuto. La parte repetida suele ir a su caché (no cuenta) y las órdenes frecuentes no
+  usan la IA, pero si conversas mucho seguido Jarvis pasa solo a Gemini (algo más lento). Es normal; en la
+  ventana de Jarvis verás "LLM ... falló: RateLimitError".
 - **Cambiaste `requirements.txt`** o falla la instalación: borra la carpeta `.venv` y abre
   `iniciar.bat` otra vez.
 

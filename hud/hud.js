@@ -16,6 +16,7 @@ const elementos = {
   acciones: document.getElementById("acciones"),
   comentario: document.getElementById("comentario"),
   aviso: document.getElementById("aviso"),
+  latencia: document.getElementById("latencia"),
 };
 
 const onda = new SiriWave({
@@ -90,6 +91,7 @@ const manejadores = {
   aviso: avisar,
   comentario: (texto) => { elementos.comentario.textContent = texto; },
   espera: esperar,
+  latencia: (texto) => { elementos.latencia.textContent = texto; },
 };
 
 const fuente = new EventSource("/hud/eventos");

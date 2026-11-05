@@ -20,13 +20,13 @@ def test_sin_persona_propia_usa_la_de_ejemplo(persona):
 
 def test_persona_propia_va_en_el_prompt(persona):
     persona.write_text("Eres Viernes, seca y directa.\n", encoding="utf-8")
-    texto = cerebro.prompt_sistema(datetime(2026, 11, 5, 9, 0), [])
+    texto = cerebro.prompt_sistema()
     assert texto.startswith("Eres Viernes, seca y directa.\n")
     assert "una a tres frases cortas" in texto
 
 
 def test_prompt_explica_las_interjecciones_y_como_guardar_el_nombre(persona):
-    texto = cerebro.prompt_sistema(datetime(2026, 11, 5, 9, 0), [])
+    texto = cerebro.prompt_sistema()
     assert "{bravo}" in texto and "'...'" in texto
     assert "'Se llama <nombre>'" in texto
 

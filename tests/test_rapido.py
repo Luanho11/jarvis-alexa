@@ -1,0 +1,245 @@
+from datetime import datetime
+
+import pytest
+
+import herramientas
+import rapido
+
+
+RAPIDAS = [
+    ("pausa", ("pausar_reanudar", {})),
+    ("Pausa.", ("pausar_reanudar", {})),
+    ("Jarvis, pausa", ("pausar_reanudar", {})),
+    ("pausa la música, por favor", ("pausar_reanudar", {})),
+    ("para la música", ("pausar_reanudar", {})),
+    ("detén el video", ("pausar_reanudar", {})),
+    ("ponle pausa", ("pausar_reanudar", {})),
+    ("reanuda", ("pausar_reanudar", {})),
+    ("dale play", ("pausar_reanudar", {})),
+    ("quita la pausa", ("pausar_reanudar", {})),
+    ("continúa la música", ("pausar_reanudar", {})),
+    ("siguiente", ("siguiente", {})),
+    ("la siguiente canción", ("siguiente", {})),
+    ("pon la siguiente", ("siguiente", {})),
+    ("pasa de canción", ("siguiente", {})),
+    ("otra canción", ("siguiente", {})),
+    ("siguiente video", ("siguiente_video", {})),
+    ("pasa al siguiente video", ("siguiente_video", {})),
+    ("anterior", ("anterior", {})),
+    ("la canción anterior", ("anterior", {})),
+    ("vuelve a la anterior", ("anterior", {})),
+    ("sube el volumen", ("subir_volumen", {"pasos": 5})),
+    ("Sube el volumen un poco", ("subir_volumen", {"pasos": 2})),
+    ("súbele", ("subir_volumen", {"pasos": 5})),
+    ("súbele al volumen", ("subir_volumen", {"pasos": 5})),
+    ("más volumen", ("subir_volumen", {"pasos": 5})),
+    ("baja el volumen mucho", ("bajar_volumen", {"pasos": 10})),
+    ("bájale", ("bajar_volumen", {"pasos": 5})),
+    ("baja el sonido", ("bajar_volumen", {"pasos": 5})),
+    ("pon el volumen al 30", ("fijar_volumen", {"porcentaje": 30})),
+    ("pon el volumen al 30%", ("fijar_volumen", {"porcentaje": 30})),
+    ("volumen al 50 por ciento", ("fijar_volumen", {"porcentaje": 50})),
+    ("volumen 40", ("fijar_volumen", {"porcentaje": 40})),
+    ("pon el volumen en treinta y cinco", ("fijar_volumen", {"porcentaje": 35})),
+    ("sube el volumen al máximo", ("fijar_volumen", {"porcentaje": 100})),
+    ("baja el volumen a la mitad", ("fijar_volumen", {"porcentaje": 50})),
+    ("volumen a cero", ("fijar_volumen", {"porcentaje": 0})),
+    ("silencia", ("silenciar", {})),
+    ("mutea", ("silenciar", {})),
+    ("quita el silencio", ("silenciar", {})),
+    ("silencia el pc", ("silenciar", {})),
+    ("pon música de Bad Bunny", ("reproducir_en_youtube", {"busqueda": "Bad Bunny"})),
+    ("pon a Shakira", ("reproducir_en_youtube", {"busqueda": "Shakira"})),
+    ("ponme Despacito", ("reproducir_en_youtube", {"busqueda": "Despacito"})),
+    ("reproduce Ñengo Flow en YouTube", ("reproducir_en_youtube", {"busqueda": "Ñengo Flow"})),
+    ("pon la canción Bohemian Rhapsody", ("reproducir_en_youtube", {"busqueda": "Bohemian Rhapsody"})),
+    ("ponme algo de rock", ("reproducir_en_youtube", {"busqueda": "rock"})),
+    ("pon música relajante", ("reproducir_en_youtube", {"busqueda": "música relajante"})),
+    ("pon música para dormir", ("reproducir_en_youtube", {"busqueda": "música para dormir"})),
+    ("quiero escuchar Coldplay", ("reproducir_en_youtube", {"busqueda": "Coldplay"})),
+    ("pon el video de gatos graciosos", ("reproducir_en_youtube", {"busqueda": "gatos graciosos"})),
+    ("abre YouTube", ("abrir_youtube", {})),
+    ("abre google", ("abrir_web", {"url": "google.com"})),
+    ("ábreme Netflix", ("abrir_web", {"url": "netflix.com"})),
+    ("abre Word", ("abrir_programa", {"nombre": "Word"})),
+    ("abre la calculadora", ("abrir_programa", {"nombre": "calculadora"})),
+    ("abre el bloc de notas", ("abrir_programa", {"nombre": "bloc de notas"})),
+    ("abre spotify", ("abrir_programa", {"nombre": "spotify"})),
+    ("abre discord", ("abrir_programa", {"nombre": "discord"})),
+    ("abre la carpeta de imágenes", ("abrir_carpeta", {"nombre": "imágenes"})),
+    ("abre mis descargas", ("abrir_carpeta", {"nombre": "descargas"})),
+    ("abre documentos", ("abrir_carpeta", {"nombre": "documentos"})),
+    ("cierra la calculadora", ("cerrar_programa", {"nombre": "calculadora"})),
+    ("cierra chrome", ("cerrar_programa", {"nombre": "chrome"})),
+    ("cierra la ventana", ("cerrar_ventana", {})),
+    ("cierra esta ventana", ("cerrar_ventana", {})),
+    ("pantalla completa", ("pantalla_completa", {})),
+    ("ponlo en pantalla completa", ("pantalla_completa", {})),
+    ("quita la pantalla completa", ("pantalla_completa", {})),
+    ("pon el video en pantalla completa", ("pantalla_completa", {})),
+    ("adelanta", ("adelantar", {"segundos": 10})),
+    ("adelanta 30 segundos", ("adelantar", {"segundos": 30})),
+    ("adelanta treinta segundos", ("adelantar", {"segundos": 30})),
+    ("adelanta el video un minuto", ("adelantar", {"segundos": 60})),
+    ("avanza medio minuto", ("adelantar", {"segundos": 30})),
+    ("retrocede", ("retroceder", {"segundos": 10})),
+    ("atrasa 20 segundos", ("retroceder", {"segundos": 20})),
+    ("regresa 10 segundos", ("retroceder", {"segundos": 10})),
+    ("regresa el video", ("retroceder", {"segundos": 10})),
+    ("haz clic", ("hacer_clic", {"boton": "izquierdo", "veces": 1})),
+    ("dale clic", ("hacer_clic", {"boton": "izquierdo", "veces": 1})),
+    ("doble clic", ("hacer_clic", {"boton": "izquierdo", "veces": 2})),
+    ("dale doble click", ("hacer_clic", {"boton": "izquierdo", "veces": 2})),
+    ("haz clic derecho", ("hacer_clic", {"boton": "derecho", "veces": 1})),
+    ("haz clic con el botón derecho", ("hacer_clic", {"boton": "derecho", "veces": 1})),
+    ("haz clic aquí", ("hacer_clic", {"boton": "izquierdo", "veces": 1})),
+    ("haz clic en Aceptar", ("clic_en", {"descripcion": "Aceptar", "boton": "izquierdo", "veces": 1})),
+    ("dale doble clic en la carpeta Fotos",
+     ("clic_en", {"descripcion": "carpeta Fotos", "boton": "izquierdo", "veces": 2})),
+    ("baja la página", ("desplazar", {"direccion": "abajo", "cantidad": 5})),
+    ("sube la página un poco", ("desplazar", {"direccion": "arriba", "cantidad": 3})),
+    ("haz scroll hacia abajo", ("desplazar", {"direccion": "abajo", "cantidad": 5})),
+    ("apaga el pc", ("apagar", {})),
+    ("apaga la computadora en 10 minutos", ("apagar", {"minutos": 10})),
+    ("apaga el ordenador en cinco minutos", ("apagar", {"minutos": 5})),
+    ("reinicia el pc", ("reiniciar", {})),
+    ("cancela el apagado", ("cancelar_apagado", {})),
+    ("cancela el reinicio", ("cancelar_apagado", {})),
+    ("no apagues el pc", ("cancelar_apagado", {})),
+    ("no lo apagues", ("cancelar_apagado", {})),
+    ("¿Qué hora es?", ("decir_hora", {})),
+    ("dime la hora", ("decir_hora", {})),
+    ("qué día es hoy", ("decir_fecha", {})),
+    ("¿a qué fecha estamos?", ("decir_fecha", {})),
+    ("minimiza todo", ("minimizar_todo", {})),
+    ("haz una captura de pantalla", ("captura_pantalla", {})),
+    ("bloquea el pc", ("bloquear", {})),
+    ("suspende el ordenador", ("suspender", {})),
+    ("maximiza la ventana", ("maximizar_ventana", {})),
+    ("silencia el ordenador", ("silenciar", {})),
+    ("apaga el sonido del ordenador", ("silenciar", {})),
+    ("mueve el mouse a la derecha", ("mover_mouse", {"direccion": "derecha", "pixeles": 100})),
+    ("mueve el ratón hacia arriba un poco", ("mover_mouse", {"direccion": "arriba", "pixeles": 50})),
+    ("pon el ratón en el centro de la pantalla", ("mover_mouse", {"posicion": "centro"})),
+    ("oye jarvis, sube el volumen por favor", ("subir_volumen", {"pasos": 5})),
+]
+
+
+@pytest.mark.parametrize("frase, esperado", RAPIDAS)
+def test_ordenes_frecuentes_van_por_la_ruta_rapida(frase, esperado):
+    assert rapido.interpretar(frase) == esperado
+
+
+@pytest.mark.parametrize("frase", [
+    "",
+    "jarvis",
+    "por favor",
+    "hola",
+    "¿cómo estás?",
+    "cuéntame un chiste",
+    "¿quién ganó el mundial?",
+    "silencio",
+    "sigue",
+    "continúa",
+    "para",
+    "sube",
+    "baja",
+    "sube un poco",
+    "más alto",
+    "apaga",
+    "apaga la luz",
+    "apaga el equipo de sonido",
+    "reinicia el router",
+    "abre la puerta",
+    "abre el documento de ayer",
+    "abre mis notas",
+    "abre música",
+    "abre word y escribe hola",
+    "abre word, escribe hola",
+    "cierra todo",
+    "cierra youtube",
+    "pon música",
+    "pon algo de música",
+    "pon un temporizador de cinco minutos",
+    "ponme una alarma a las siete",
+    "pon el modo trabajo",
+    "pon la de ayer",
+    "pon las luces",
+    "pon noticias",
+    "pon atención",
+    "pon despacito en spotify",
+    "pon música de bad bunny y sube el volumen",
+    "pon que te vaya bonito",
+    "pon música de shakira, luego apaga el pc",
+    "pausa, sube el volumen",
+    "pausa y sube el volumen",
+    "sube el volumen y pon música",
+    "no pauses",
+    "¿pausaste la música?",
+    "¿puedes subir el volumen?",
+    "volumen al 150",
+    "volumen alto",
+    "pon el volumen al ciento cincuenta",
+    "adelanta la reunión",
+    "adelanta la reunión de mañana",
+    "regresa",
+    "retrocede cero segundos",
+    "apaga el pc en cero minutos",
+    "siguiente pregunta",
+    "el siguiente paso",
+    "a qué hora es la reunión",
+    "qué hora es en Tokio",
+    "haz clic en el botón que dice aceptar y luego en guardar",
+    "haz clic en el enlace de la segunda noticia del lado izquierdo",
+    "reproduce",
+    "quiero ver una película",
+    "baja la luz",
+    "mueve el mouse a la derecha y haz clic",
+    "mueve el mouse al botón de enviar",
+    "maximiza el volumen",
+    "pon por favor despacito",
+])
+def test_en_la_duda_decide_el_llm(frase):
+    assert rapido.interpretar(frase) is None
+
+
+def test_la_ruta_rapida_solo_usa_herramientas_reales_o_respuestas_locales():
+    nombres = {nombre for _, (nombre, _) in RAPIDAS}
+    assert nombres <= herramientas.FUNCIONES.keys() | rapido.LOCALES.keys()
+    assert not rapido.LOCALES.keys() & herramientas.FUNCIONES.keys()
+
+
+@pytest.mark.parametrize("texto, valor", [
+    ("30", 30), ("cero", 0), ("cinco", 5), ("quince", 15), ("veintidos", 22), ("cuarenta", 40),
+    ("setenta y ocho", 78), ("cien", 100), ("medio", None), ("treinta y diez", None),
+])
+def test_numeros_en_cifras_y_en_palabras(texto, valor):
+    assert rapido.numero(texto) == valor
+
+
+@pytest.mark.parametrize("ahora, frase", [
+    (datetime(2026, 11, 5, 15, 30), "Son las 3 y 30 de la tarde."),
+    (datetime(2026, 11, 5, 13, 5), "Es la 1 y 5 de la tarde."),
+    (datetime(2026, 11, 5, 0, 0), "Son las 12 en punto de la madrugada."),
+    (datetime(2026, 11, 5, 9, 15), "Son las 9 y 15 de la mañana."),
+    (datetime(2026, 11, 5, 22, 45), "Son las 10 y 45 de la noche."),
+])
+def test_dice_la_hora_como_se_habla(ahora, frase):
+    assert rapido.decir_hora(ahora) == frase
+
+
+def test_dice_la_fecha():
+    assert rapido.decir_fecha(datetime(2026, 11, 5)) == "Hoy es jueves 5 de noviembre de 2026."
+
+
+@pytest.mark.parametrize("texto, simple", [
+    ("sube el volumen", True),
+    ("ponme un temporizador de cinco minutos", True),
+    ("abre word y escribe hola", False),
+    ("abre word, escribe hola", False),
+    ("pon música luego apaga", False),
+    ("si llueve avísame", False),
+    ("no abras nada", False),
+])
+def test_es_simple(texto, simple):
+    assert rapido.es_simple(texto) is simple

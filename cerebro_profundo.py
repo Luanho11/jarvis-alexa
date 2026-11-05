@@ -10,6 +10,7 @@ import openai
 import config
 import panel
 from acciones import memoria, recordatorios
+from rapido import DIAS
 
 MAX_RONDAS = 10
 TIEMPO_MAXIMO = 180
@@ -84,8 +85,6 @@ def _ejecutar(nombre: str, argumentos: str | None, tras_lectura: bool) -> str:
 
 
 def prompt_sistema(ahora: datetime, datos_usuario: list[str]) -> str:
-    from cerebro import DIAS
-
     sabido = "; ".join(datos_usuario) or "nada todavía"
     return (
         "Eres Jarvis trabajando en segundo plano en un encargo del usuario. Resuélvelo en varios pasos con las "
