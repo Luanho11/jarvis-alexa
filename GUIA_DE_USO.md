@@ -191,7 +191,11 @@ Todo se guarda **solo en tu PC**, en la carpeta de Jarvis. No se sube a ningún 
 
 Cuando hablas con Alexa aparece en tu pantalla una ventana con un círculo animado:
 - Muestra lo que dijiste, lo que respondió y las acciones que hizo.
-- Se esconde sola unos segundos después de terminar.
+- Se esconde sola unos segundos después de terminar. Al encender Jarvis aparece un momento y se minimiza: así luego sale al instante.
+- **Puedes escribirle** en la caja de abajo ("Escríbele a Jarvis…") y pulsar Enter, sin hablar con Alexa. La respuesta sale en el panel.
+- **Botones**: ⏯ Pausa (música o vídeo), ⏻ Anular apagado, 👁 No vigilar (deja de comentar tu pantalla) y ▾ Ocultar.
+- La primera vez muestra frases de ejemplo: púlsalas para probar.
+- Si Groq o Gemini fallan, el panel te dice por qué en una línea (cuota agotada, clave mala o sin internet).
 - Si no lo quieres, abre el archivo `.env` y pon `HUD_ACTIVO=no`.
 
 ---
