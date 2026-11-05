@@ -1,0 +1,16 @@
+# Topes de version mayor: una version nueva no cambia la API sin avisar (borra .venv para actualizar).
+requests>=2.32,<3
+pyautogui>=0.9.54,<1; sys_platform == "win32"
+pycaw>=20240316; sys_platform == "win32"
+flask>=3.0,<4
+ask-sdk-core>=1.19,<2
+flask-ask-sdk>=1.0,<2
+pytest>=8,<10
+openai>=3.45,<4
+python-dotenv>=1.0,<2
+psutil>=7,<8
+pyperclip>=1.9,<2; sys_platform == "win32"
+pillow>=11; sys_platform == "win32"
+python-docx>=1.1,<2
+pygetwindow>=0.0.9,<0.1; sys_platform == "win32"
+ddgs>=9,<10

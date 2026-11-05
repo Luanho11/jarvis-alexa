@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jarvis HUD</title>
+  <link rel="stylesheet" href="/hud/hud.css">
+</head>
+<body data-estado="espera">
+  <header class="cabecera">
+    <span class="marca">JARVIS</span>
+    <span id="conexion" class="conexion">conectando…</span>
+    <time id="reloj" class="reloj"></time>
+  </header>
+
+  <main class="centro">
+    <div class="orbe" aria-hidden="true">
+      <div class="anillo anillo-exterior"></div>
+      <div class="anillo anillo-medio"></div>
+      <div class="anillo anillo-interior"></div>
+      <div class="nucleo"></div>
+    </div>
+    <p id="estado" class="estado">En espera</p>
+    <div id="onda" class="onda"></div>
+  </main>
+
+  <section class="conversacion">
+    <p id="usuario" class="linea linea-usuario"></p>
+    <p id="respuesta" class="linea linea-respuesta"></p>
+  </section>
+
+  <ul id="acciones" class="acciones"></ul>
+  <p id="comentario" class="comentario"></p>
+  <p id="aviso" class="aviso"></p>
+
+  <script src="/hud/siriwave.umd.js"></script>
+  <script src="/hud/hud.js"></script>
+</body>
+</html>

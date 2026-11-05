@@ -1,0 +1,17 @@
+{
+  "trabajo": [
+    {"accion": "abrir_programa", "argumentos": {"nombre": "outlook"}},
+    {"accion": "abrir_programa", "argumentos": {"nombre": "word"}},
+    {"accion": "abrir_web", "argumentos": {"url": "https://mail.google.com"}}
+  ],
+  "estudio": [
+    {"accion": "cerrar_programa", "argumentos": {"nombre": "whatsapp"}},
+    {"accion": "abrir_programa", "argumentos": {"nombre": "word"}},
+    {"accion": "reproducir_en_youtube", "argumentos": {"busqueda": "musica para estudiar y concentrarse"}},
+    {"accion": "fijar_volumen", "argumentos": {"porcentaje": 20}}
+  ],
+  "relax": [
+    {"accion": "reproducir_en_youtube", "argumentos": {"busqueda": "lofi hip hop para relajarse"}},
+    {"accion": "fijar_volumen", "argumentos": {"porcentaje": 30}}
+  ]
+}

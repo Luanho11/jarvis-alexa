@@ -1,0 +1,10 @@
+.venv/
+.env
+agenda.json
+__pycache__/
+.pytest_cache/
+memoria.json
+rutinas.json
+notas/
+persona.md
+echo_uso.json
