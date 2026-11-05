@@ -37,3 +37,4 @@
 - 05/11 Supervisor: nota tras las mejoras del HUD 6,5/10 (interactividad 3→6, fluidez 5→6); hechas 7 mejoras del plan.
 - 05/11 Dev HUD: historial de la conversación de hoy (🕘, últimas 20, copiar cada respuesta).
 - 05/11 Dev HUD: cuenta atrás de apagado/reinicio con botón Cancelar; el orbe se encoge en ventanas bajas para que los botones nunca queden fuera. 918 tests OK.
+- 05/11 Dev UX: "¿qué puedes hacer?"/"ayuda" contesta al instante sin IA con 6 categorías (también la ayuda de Alexa). 924 tests OK.

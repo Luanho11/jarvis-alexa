@@ -15,6 +15,7 @@ from flask_ask_sdk.skill_adapter import (
 
 import cerebro_profundo
 import panel
+import rapido
 import voz
 from acciones import aprendizaje, calculo, memoria, personas, vigilancia
 from acciones.programas import normalizar
@@ -29,10 +30,7 @@ INVITACIONES = [
     "Jarvis a tu servicio, ¿qué hacemos?",
     "¿Por dónde empezamos?",
 ]
-AYUDA = (
-    "Háblame con normalidad: pídeme música, cambiar el volumen, "
-    "abrir YouTube o agendar algo. ¿Qué necesitas?"
-)
+AYUDA = rapido.CAPACIDADES
 DESPEDIDA = "Hasta luego."
 NO_ENTENDI = "No te entendí, ¿lo repites?"
 ERROR = "Perdona, tuve un problema. ¿Lo intentas otra vez?"

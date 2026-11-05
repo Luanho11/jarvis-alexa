@@ -103,7 +103,18 @@ def decir_fecha(ahora: datetime) -> str:
 
 
 # Respuestas de la ruta rápida que no son herramientas.
-LOCALES = {"decir_hora": decir_hora, "decir_fecha": decir_fecha}
+CAPACIDADES = (
+    "Puedo con seis cosas: música y vídeos; tu PC, como programas, ventanas, volumen, mouse y apagado; "
+    "agenda, recordatorios y notas; buscar en internet, noticias y clima; mirar tu pantalla y aconsejarte; "
+    "y conversar, enseñarte o leerte documentos y correos. ¿Con cuál empezamos?"
+)
+
+
+def que_puedo_hacer(ahora: datetime) -> str:
+    return CAPACIDADES
+
+
+LOCALES = {"decir_hora": decir_hora, "decir_fecha": decir_fecha, "que_puedo_hacer": que_puedo_hacer}
 
 
 def _cantidad(cuanto: str | None, poco: int, normal: int, mucho: int) -> int:
@@ -214,6 +225,8 @@ REGLAS = [(re.compile(patron), regla) for patron, regla in [
     (r"(?:que hora es|que horas son|dime la hora|la hora|me dices la hora)(?: ahora)?", _fija("decir_hora")),
     (r"que (?:dia|fecha) es(?: hoy)?|a que (?:dia|fecha) estamos(?: hoy)?|a cuanto estamos(?: hoy)?"
      r"|dime la fecha|la fecha de hoy|que dia de la semana es(?: hoy)?", _fija("decir_fecha")),
+    (r"(?:que|cuales) (?:cosas )?(?:puedes|sabes) hacer|que haces|para que sirves|en que me (?:puedes )?ayudar"
+     r"|ayuda|ayudame|como te uso|que te puedo pedir", _fija("que_puedo_hacer")),
     (r"buenos dias|(?:dame |dime )?(?:mi resumen|(?:el |mi )?resumen (?:del dia|de hoy))(?: del dia)?|que hay (?:para )?hoy",
      _fija("resumen_del_dia")),
     (rf"pausa|pausalo|pausala|pon pausa|ponle pausa|(?:pausa|para|deten) {MEDIA}", _fija("pausar_reanudar")),

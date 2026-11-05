@@ -253,3 +253,13 @@ def test_dice_la_fecha():
 ])
 def test_es_simple(texto, simple):
     assert rapido.es_simple(texto) is simple
+
+
+@pytest.mark.parametrize("frase", ["¿Qué puedes hacer?", "qué sabes hacer", "ayuda", "¿En qué me puedes ayudar?", "para qué sirves"])
+def test_que_puedo_hacer_sin_ia(frase):
+    assert rapido.interpretar(frase) == ("que_puedo_hacer", {})
+
+
+def test_las_capacidades_caben_en_una_respuesta_corta():
+    assert len(rapido.CAPACIDADES.split()) <= 55
+    assert rapido.LOCALES["que_puedo_hacer"](None) == rapido.CAPACIDADES
