@@ -18,6 +18,6 @@
 - Comprobar que la prueba de Windows en GitHub Actions pasa en verde.
 
 ## 4. Otros
-- Rehacer la autoevaluación (`docs/EVALUACION.md`) añadiendo diseño, fluidez, animaciones e interactividad.
+- Plan de mejoras por cada punto débil de la nota (interactividad, UX, diseño, fluidez, calidad): `docs/MEJORAS.md`.
 - Configurar la skill en la consola de Alexa (o instalar Claude in Chrome para que Claude lo haga).
 - Ideas para después en `docs/IDEAS_2.md` (dictado continuo, imágenes gratis, etc.).
