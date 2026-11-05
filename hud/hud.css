@@ -222,6 +222,37 @@ body[data-estado="espera"] .orbe {
 }
 
 /* Ventana baja: el orbe y la onda se encogen para dejar sitio a la respuesta. */
+.ejemplos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.ejemplos[hidden] {
+  display: none;
+}
+
+.ejemplos button {
+  border: 1px dashed color-mix(in srgb, var(--acento) 45%, transparent);
+  background: transparent;
+  color: var(--tenue);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.ejemplos button:hover {
+  color: var(--texto);
+  border-color: var(--acento);
+}
+
 .botones {
   display: flex;
   flex-wrap: wrap;

@@ -77,6 +77,8 @@ function hablar(texto) {
 }
 
 function escucharUsuario(texto) {
+  // Los ejemplos solo sirven hasta la primera orden.
+  document.getElementById("ejemplos").hidden = true;
   clearTimeout(vueltaAEscuchar);
   clearInterval(escritura);
   elementos.usuario.textContent = texto;
@@ -147,6 +149,10 @@ async function enviar(ruta, datos) {
 
 for (const boton of document.querySelectorAll("[data-orden]")) {
   boton.addEventListener("click", () => enviar("/hud/orden", { orden: boton.dataset.orden }));
+}
+
+for (const ejemplo of document.querySelectorAll("#ejemplos button")) {
+  ejemplo.addEventListener("click", () => enviar("/hud/escribir", { texto: ejemplo.textContent }));
 }
 
 const formulario = document.getElementById("escribir");

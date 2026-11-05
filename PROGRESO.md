@@ -33,3 +33,4 @@
 - 05/11 Dev HUD: botones (pausa, anular apagado, no vigilar, ocultar) y caja "Escríbele a Jarvis" con el mismo cerebro; órdenes solo en JSON desde el propio PC (bloquea otras webs e internet). 912 tests OK.
 - 05/11 Dev HUD: se abre minimizado al arrancar (la 1.ª orden ya no espera a Edge), aparece con fundido, respuesta palabra a palabra al ritmo de la voz, colores de estado con transición y respeta "reducir movimiento" de Windows. 913 tests OK.
 - 05/11 Dev HUD: si Groq o Gemini fallan, el HUD lo explica en lenguaje normal (cuota agotada → respaldo, clave mala → revisa .env, sin internet). 916 tests OK.
+- 05/11 Dev HUD: 4 frases de ejemplo pulsables al abrirlo (se esconden tras la primera orden).
