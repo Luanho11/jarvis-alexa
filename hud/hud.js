@@ -153,7 +153,34 @@ function esperar() {
   ponerEstado("espera");
 }
 
+let cuentaAtras;
+
+function contarHasta(que, texto) {
+  const cuenta = document.getElementById("cuenta");
+  clearInterval(cuentaAtras);
+  let quedan = Number(texto);
+  cuenta.hidden = !(quedan > 0);
+  if (cuenta.hidden) return;
+  const pintar = () => {
+    const minutos = Math.floor(quedan / 60);
+    const segundos = String(quedan % 60).padStart(2, "0");
+    document.getElementById("cuenta-texto").textContent = `${que} en ${minutos}:${segundos}`;
+  };
+  pintar();
+  cuentaAtras = setInterval(() => {
+    quedan -= 1;
+    if (quedan <= 0) {
+      clearInterval(cuentaAtras);
+      cuenta.hidden = true;
+      return;
+    }
+    pintar();
+  }, 1000);
+}
+
 const manejadores = {
+  apagado: (texto) => contarHasta("Apagando el PC", texto),
+  reinicio: (texto) => contarHasta("Reiniciando el PC", texto),
   usuario: escucharUsuario,
   respuesta: hablar,
   accion: agregarAccion,

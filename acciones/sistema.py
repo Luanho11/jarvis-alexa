@@ -5,6 +5,8 @@ from pathlib import Path
 
 import psutil
 
+import panel
+
 NOMBRES_TECLAS = {
     "control": "ctrl",
     "windows": "win",
@@ -32,6 +34,8 @@ def apagar(minutos: int = 1) -> str:
     minutos = _minutos(minutos)
     if not _ejecutar(["shutdown", "/s", "/t", str(minutos * 60)]):
         return "No pude programar el apagado."
+    # El HUD enseña la cuenta atrás con un botón para cancelarla.
+    panel.emitir("apagado", str(minutos * 60))
     return f"Apagaré el PC en {minutos} minuto{'s' if minutos > 1 else ''}. Si cambias de idea, di cancela el apagado."
 
 
@@ -39,12 +43,14 @@ def reiniciar(minutos: int = 1) -> str:
     minutos = _minutos(minutos)
     if not _ejecutar(["shutdown", "/r", "/t", str(minutos * 60)]):
         return "No pude programar el reinicio."
+    panel.emitir("reinicio", str(minutos * 60))
     return f"Reiniciaré el PC en {minutos} minuto{'s' if minutos > 1 else ''}. Si cambias de idea, di cancela el apagado."
 
 
 def cancelar_apagado() -> str:
     if not _ejecutar(["shutdown", "/a"]):
         return "No había ningún apagado programado."
+    panel.emitir("apagado", "0")
     return "Cancelé el apagado."
 
 

@@ -14,7 +14,7 @@ El HUD solo muestra; no se puede tocar.
 - ✅ **A** Pantalla de bienvenida la primera vez: 5 frases de ejemplo ("pon música de…", "qué hay en mi pantalla", "recuérdame…") que se pueden pulsar para probar.
 - ✅ **A** Mensajes de error en lenguaje normal en el HUD y en la voz: hoy "falta la clave de Groq" solo sale en la consola negra. Mostrar qué pasó y qué hacer en una línea.
 - **A** Indicador claro de estado: escuchando / pensando / haciendo / hablando, con color distinto y texto; y aviso visible cuando está usando el respaldo (Gemini) porque Groq se agotó.
-- **B** Confirmaciones visibles para lo peligroso (apagar, cerrar programa, clic): tarjeta con cuenta atrás y botón Cancelar, además de la voz.
+- ✅ (apagar y reiniciar) **B** Confirmaciones visibles para lo peligroso (apagar, cerrar programa, clic): tarjeta con cuenta atrás y botón Cancelar, además de la voz.
 - **B** "¿Qué puedes hacer?" responde con 6 categorías cortas en vez de una lista larga, y el HUD muestra la lista completa agrupada.
 - **C** Sonido corto (opcional) al empezar y terminar una acción en el PC.
 

@@ -66,7 +66,8 @@ body[data-estado="hablando"] { --acento: #5df2ff; --ritmo: 0.7; }
 
 .orbe {
   position: relative;
-  width: 210px;
+  /* Se encoge en ventanas bajas para que los botones de abajo nunca queden fuera. */
+  width: clamp(96px, 26vh, 210px);
   aspect-ratio: 1;
   transition: opacity 0.6s;
 }
@@ -127,8 +128,8 @@ body[data-estado="espera"] .orbe {
 
 .conversacion {
   flex: 1;
-  /* Dos líneas del usuario y tres de respuesta; sin esto se encoge bajo las acciones. */
-  min-height: 8em;
+  /* Una línea del usuario y dos de respuesta; sin esto se encoge bajo las acciones. */
+  min-height: 6em;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -287,6 +288,36 @@ body[data-estado="espera"] .orbe {
   padding: 0;
 }
 
+.cuenta {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--alerta);
+  background: color-mix(in srgb, var(--alerta) 14%, transparent);
+  color: var(--texto);
+  font-variant-numeric: tabular-nums;
+  animation: aparecer 180ms ease-out;
+}
+
+.cuenta[hidden] {
+  display: none;
+}
+
+.cuenta button {
+  border: none;
+  border-radius: 999px;
+  padding: 5px 12px;
+  background: var(--alerta);
+  color: #1a0a00;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .ejemplos {
   list-style: none;
   margin: 0;
@@ -297,7 +328,8 @@ body[data-estado="espera"] .orbe {
   justify-content: center;
 }
 
-.ejemplos[hidden] {
+.ejemplos[hidden],
+body:has(.cuenta:not([hidden])) .ejemplos {
   display: none;
 }
 

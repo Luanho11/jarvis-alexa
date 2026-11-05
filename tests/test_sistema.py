@@ -128,3 +128,20 @@ def test_estado_pc_con_y_sin_bateria(monkeypatch):
     assert sistema.estado_pc() == "Procesador al 12 por ciento y memoria al 41 por ciento."
     monkeypatch.setattr(sistema.psutil, "sensors_battery", lambda: SimpleNamespace(percent=80, power_plugged=True))
     assert sistema.estado_pc().endswith("Batería al 80 por ciento, cargando.")
+
+
+def test_el_hud_recibe_la_cuenta_atras_y_su_cancelacion(ejecutados, monkeypatch):
+    eventos = []
+    monkeypatch.setattr(sistema.panel, "emitir", lambda tipo, texto="": eventos.append((tipo, texto)))
+    sistema.apagar(2)
+    sistema.reiniciar(1)
+    sistema.cancelar_apagado()
+    assert eventos == [("apagado", "120"), ("reinicio", "60"), ("apagado", "0")]
+
+
+def test_sin_apagado_programado_el_hud_no_cambia(ejecutados, monkeypatch):
+    eventos = []
+    monkeypatch.setattr(sistema.panel, "emitir", lambda tipo, texto="": eventos.append((tipo, texto)))
+    ejecutados.codigo = 1
+    sistema.apagar()
+    assert eventos == []
