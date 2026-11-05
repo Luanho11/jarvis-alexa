@@ -217,8 +217,8 @@ def crear_app(cerebro, verificar=True):
     return app
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+def preparar() -> Flask:
+    """Comprueba la configuración y deja todo listo para atender a Alexa; SystemExit con el motivo si falta algo."""
     # Sin estos datos todo falla en silencio desde Alexa; mejor avisar al arrancar.
     if not ALEXA_SKILL_ID:
         raise SystemExit("Falta ALEXA_SKILL_ID en el archivo .env")
@@ -228,4 +228,9 @@ if __name__ == "__main__":
     iniciar_vigilante()
     calculo.precargar()
     panel.preparar()
-    crear_app(cerebro).run(port=5000)
+    return crear_app(cerebro)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    preparar().run(port=5000)

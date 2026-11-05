@@ -89,7 +89,8 @@ Una "skill" es como una app para Alexa. Esta será tu Jarvis.
 
 1. Vuelve a hacer doble clic en **`iniciar.bat`**.
 2. La primera vez tarda unos minutos instalando cosas. Es normal.
-3. Se abrirán **dos ventanas negras**: Jarvis y ngrok. **No las cierres** mientras quieras usarlo. Puedes minimizarlas.
+3. La ventana negra se cierra sola y aparece un **icono redondo azul junto al reloj** de Windows (si no lo ves, pulsa la flechita ^ al lado del reloj). Eso significa que Jarvis está encendido.
+4. Clic derecho en ese icono: **Abrir panel**, **Ver registro** (los mensajes de Jarvis, por si algo falla), **Editar claves (.env)** y **Salir** (apaga Jarvis).
 
 ¡Listo! A partir de ahora, cada vez que quieras usar Jarvis solo haces doble clic en `iniciar.bat`.
 
@@ -216,14 +217,14 @@ Cuando hablas con Alexa aparece en tu pantalla una ventana con un círculo anima
 
 | Qué pasa | Qué hacer |
 |---|---|
-| Alexa dice que la skill no responde | Revisa que las dos ventanas negras estén abiertas y que la PC tenga internet. |
+| Alexa dice que la skill no responde | Revisa que el icono de Jarvis esté junto al reloj y que la PC tenga internet. |
 | Alexa no encuentra "mi jarvis" | En la consola de Alexa, pestaña Test, debe estar en **Development**. El idioma de la skill debe ser el mismo que el de tu Echo. |
-| La ventana de Jarvis dice "Falta ALEXA_SKILL_ID" o "Falta GROQ_API_KEY" | Abre `.env` y revisa que copiaste bien las claves, sin espacios. |
+| Sale un aviso "Falta ALEXA_SKILL_ID" o "Falta GROQ_API_KEY" | Jarvis te abre `.env`: revisa que copiaste bien las claves, sin espacios, guarda y vuelve a abrir `iniciar.bat`. |
 | Responde "No pude pensar ahora mismo" | Se acabó la cuota gratis del momento. Espera un minuto. Si pasa mucho, pon también la clave de Gemini. |
-| No sube el volumen o no hace clic | Asegúrate de no tener la PC bloqueada. Mira el mensaje de error en la ventana de Jarvis. |
+| No sube el volumen o no hace clic | Asegúrate de no tener la PC bloqueada. Mira el error en el registro (clic derecho en el icono, **Ver registro**). |
 | Te entiende mal una frase larga | Dila más despacio o en dos partes. |
 
-Si nada funciona, copia el último mensaje de la ventana negra de Jarvis y envíalo.
+Si nada funciona, abre el registro (clic derecho en el icono, **Ver registro**), copia las últimas líneas y envíalas.
 
 ---
 

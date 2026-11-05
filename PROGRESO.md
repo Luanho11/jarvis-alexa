@@ -40,3 +40,4 @@
 - 05/11 Dev UX: "¿qué puedes hacer?"/"ayuda" contesta al instante sin IA con 6 categorías (también la ayuda de Alexa). 924 tests OK.
 - 05/11 Dev Persona: no repite la misma confirmación ("Hecho.") dos veces seguidas. 925 tests OK.
 - 05/11 Dev Calidad: las 71 acciones se ofrecen al LLM como 51 herramientas (grupos volumen, reproduccion, ventana, mouse, energia, vigilancia, modos con "accion"); por dentro siguen los nombres individuales, así que freno anti-inyección, respuestas directas, ruta rápida y cerebro profundo no cambian. Esquemas ~4.200 → ~3.500 tokens. 931 tests OK.
+- 05/11 Dev App: lanzador.py arranca Jarvis y ngrok sin ventanas negras con icono junto al reloj (Abrir panel, Ver registro, Editar claves, Salir), registro rotativo en logs/jarvis.log, avisos en ventana si faltan claves, falta ngrok o ya está abierto; iniciar.bat lo usa (reinstala deps una vez por pystray). Guía y README al día. 936 tests OK; falta el .exe con instalador.

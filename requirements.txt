@@ -17,3 +17,4 @@ ddgs>=9,<10
 pypdf>=6.21,<7
 trafilatura>=2.3,<3
 pint>=0.26,<1
+pystray>=0.19,<1; sys_platform == "win32"

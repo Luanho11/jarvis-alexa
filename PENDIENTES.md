@@ -1,6 +1,7 @@
 # Pendientes
 
 ## 1. Convertir Jarvis en aplicación (en vez de .bat)
+- ✅ Hecho (05/11): `lanzador.py` sin ventanas negras, icono junto al reloj (Abrir panel, Ver registro, Editar claves, Salir), registro en `logs/jarvis.log`, aviso si faltan claves o ya está abierto. `iniciar.bat` lo usa.
 - Empaquetar con **PyInstaller** (`pyinstaller --noconsole --icon jarvis.ico --name Jarvis lanzador.py`) un `lanzador.py` que arranque servidor y ngrok sin ventanas negras.
 - Icono en la **bandeja del sistema** con `pystray` (Abrir panel, Pausar, Ver registro, Salir).
 - Primer arranque con una ventana de configuración (claves, Skill ID, dominio ngrok) que escriba `.env`, en vez de editarlo en el Bloc de notas.

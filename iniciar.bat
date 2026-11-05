@@ -15,13 +15,10 @@ if not exist .venv\Scripts\python.exe (
 )
 
 rem La marca evita reinstalar en cada arranque; si la instalacion falla se reintenta la proxima vez.
-if not exist .venv\instalado (
+rem Cambia de nombre cuando requirements.txt suma librerias, para que una instalacion vieja las reciba.
+if not exist .venv\instalado-2 (
     .venv\Scripts\python -m pip install -r requirements.txt || goto error
-    echo ok> .venv\instalado
-)
-
-for /f "usebackq tokens=1,* delims==" %%a in (".env") do (
-    if /i "%%a"=="NGROK_DOMINIO" set "NGROK_DOMINIO=%%b"
+    echo ok> .venv\instalado-2
 )
 
 where ngrok >nul 2>&1 || (
@@ -29,15 +26,9 @@ where ngrok >nul 2>&1 || (
     goto error
 )
 
-rem 127.0.0.1 y no "localhost": Flask solo escucha en IPv4 y ngrok podria intentar IPv6.
-if defined NGROK_DOMINIO (
-    start "ngrok" ngrok http --url=%NGROK_DOMINIO% 127.0.0.1:5000
-) else (
-    start "ngrok" ngrok http 127.0.0.1:5000
-)
-
-.venv\Scripts\python servidor.py
-pause
+rem Sin ventanas negras: Jarvis y ngrok quedan en segundo plano con un icono junto al reloj.
+rem Para ver los mensajes, clic derecho en el icono, "Ver registro". Para depurar: .venv\Scripts\python servidor.py
+start "" .venv\Scripts\pythonw.exe lanzador.py
 exit /b
 
 :falta_python

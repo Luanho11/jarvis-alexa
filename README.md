@@ -375,7 +375,7 @@ Encima de eso quedan Gemini (unas 500 al día gratis en flash-lite, más lento) 
 `scripts/medir_latencia.py` muestra los tokens reales de cada llamada en tu PC.
 - **Mídelo en tu PC**: `.venv\Scripts\python scripts\medir_latencia.py` hace 5 veces una orden directa, una
   orden con IA y una pregunta, con tus claves, y muestra la mediana y el p90 (las acciones se simulan: no
-  toca tu PC). En la ventana de Jarvis cada petición dice cuánto tardó la IA, cuántos tokens fueron a la
+  toca tu PC). En el registro de Jarvis (`logs/jarvis.log`, o clic derecho en el icono → Ver registro) cada petición dice cuánto tardó la IA, cuántos tokens fueron a la
   caché y cuánto las acciones; el HUD lo muestra en pequeño abajo.
 - Si una respuesta pasa de 6,5 s (Groq saturado y Gemini lento), Alexa dice "dime 'y bien'" para no
   cortarse a los 8 s.
@@ -383,7 +383,7 @@ Encima de eso quedan Gemini (unas 500 al día gratis en flash-lite, más lento) 
 ## Limitaciones
 
 - **Aún no se ha probado en un Windows real**: está probado con pruebas automáticas, pero la
-  primera vez puede fallar algún detalle. Los errores salen en la ventana de Jarvis.
+  primera vez puede fallar algún detalle. Los errores salen en el registro (`logs/jarvis.log`).
 - Siempre hay que empezar con **"Alexa, abre mi jarvis"** (o "pide a mi jarvis..."): una skill
   propia no puede escuchar sin su nombre.
 - **Alexa no habla sola** salvo con Voice Monkey (opcional, ver arriba): sin él, recordatorios,
@@ -408,10 +408,10 @@ Encima de eso quedan Gemini (unas 500 al día gratis en flash-lite, más lento) 
 
 - **"No encuentro Python"**: reinstala Python marcando *Add python.exe to PATH*.
 - **"No encuentro ngrok"**: ejecuta `winget install ngrok.ngrok` y vuelve a abrir `iniciar.bat`.
-- **La ventana de Jarvis dice "Falta ALEXA_SKILL_ID" o "Falta GROQ_API_KEY..."**: revisa el
-  archivo `.env` (sin espacios alrededor del `=`).
-- **Alexa dice "Hubo un problema con la respuesta de la skill"**: comprueba que las dos ventanas
-  siguen abiertas, que el Endpoint termina en `/alexa`, que elegiste la opción de certificado
+- **Sale un aviso "Falta ALEXA_SKILL_ID" o "Falta GROQ_API_KEY..."**: Jarvis abre el
+  archivo `.env` para que lo revises (sin espacios alrededor del `=`).
+- **Alexa dice "Hubo un problema con la respuesta de la skill"**: comprueba que el icono de Jarvis
+  está junto al reloj, que el Endpoint termina en `/alexa`, que elegiste la opción de certificado
   *wildcard* y que el Skill ID de `.env` es el de tu skill.
 - **ngrok dice que el endpoint ya está en uso** (`ERR_NGROK_334`): ya hay otro ngrok abierto;
   ciérralo y vuelve a abrir `iniciar.bat`.
@@ -424,7 +424,7 @@ Encima de eso quedan Gemini (unas 500 al día gratis en flash-lite, más lento) 
 - **Groq dice que llegaste al límite (429)**: cada consulta a la IA envía unos 6.000 tokens y el plan gratis
   de Groq da 8.000 por minuto por modelo. La parte repetida suele ir a su caché (no cuenta) y las órdenes
   frecuentes no usan la IA, pero si conversas mucho seguido Jarvis pasa solo a `gpt-oss-20b` y luego a
-  Gemini (algo más lento). Es normal; en la ventana de Jarvis verás "LLM ... falló: RateLimitError".
+  Gemini (algo más lento). Es normal; en el registro verás "LLM ... falló: RateLimitError".
 - **Cambiaste `requirements.txt`** o falla la instalación: borra la carpeta `.venv` y abre
   `iniciar.bat` otra vez.
 
