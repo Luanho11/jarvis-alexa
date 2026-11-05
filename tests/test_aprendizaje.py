@@ -186,6 +186,8 @@ def test_resumir_sesion_corta_no_gasta_cuota():
     llm = LLMFalso("{}")
     aprendizaje.resumir_sesion(conversacion("pon música"), llm)
     aprendizaje.resumir_sesion([], llm)
+    aprendizaje.resumir_sesion(None, llm)
+    aprendizaje.resumir_sesion(["hola", None], llm)
     assert llm.peticiones == []
 
 

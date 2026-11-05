@@ -297,10 +297,10 @@ def resumir_sesion(mensajes: list[dict], llamar_llm) -> None:
 
     llamar_llm(mensajes: list[dict]) -> str recibe mensajes de chat (system + user) y devuelve el texto.
     """
-    turnos = sum(mensaje.get("role") == "user" for mensaje in mensajes)
-    if turnos < MIN_TURNOS:
+    mensajes = [mensaje for mensaje in mensajes or [] if isinstance(mensaje, dict)]
+    if sum(mensaje.get("role") == "user" for mensaje in mensajes) < MIN_TURNOS:
         return
-    threading.Thread(target=_resumir, args=(list(mensajes), llamar_llm), daemon=True).start()
+    threading.Thread(target=_resumir, args=(mensajes, llamar_llm), daemon=True).start()
 
 
 def que_sabes_de_mi() -> str:
