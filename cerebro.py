@@ -1,5 +1,6 @@
 import json
 import logging
+import random
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -28,6 +29,8 @@ MAX_TOKENS = 2048
 
 MENSAJE_LENTO = "Me tardé demasiado, ¿lo repites?"
 MENSAJE_FALLO = "No pude pensar ahora mismo, inténtalo otra vez."
+# Confirmaciones cortas: si toca repetir la anterior, se dice otra para no sonar a máquina.
+CONFIRMACIONES = ("Hecho.", "Listo.", "Ya está.", "Hecho, jefe.", "Va.")
 
 PERSONA = Path(__file__).parent / "persona.md"
 PERSONA_EJEMPLO = Path(__file__).parent / "persona.ejemplo.md"
@@ -143,6 +146,13 @@ def _pausa_por_limite(error: openai.RateLimitError) -> float:
     return min(max(espera, 1), MAX_PAUSA_LIMITE)
 
 
+def _sin_repetir(respuesta: str, historial: list[dict]) -> str:
+    anterior = next((m["content"] for m in reversed(historial) if m["role"] == "assistant"), None)
+    if respuesta not in CONFIRMACIONES or respuesta != anterior:
+        return respuesta
+    return random.choice([otra for otra in CONFIRMACIONES if otra != anterior])
+
+
 def _explicar_fallo(error: openai.OpenAIError, modelo: str) -> str:
     """Lo que se ve en el HUD cuando un proveedor falla, dicho para quien no lee la consola."""
     proveedor = "Gemini" if "gemini" in modelo.lower() else "Groq"
@@ -219,6 +229,7 @@ class Cerebro:
             respuesta = MENSAJE_LENTO
         except openai.OpenAIError:
             respuesta = MENSAJE_FALLO
+        respuesta = _sin_repetir(respuesta, historial)
         historial.append({"role": "assistant", "content": respuesta})
         del historial[:-MAX_MENSAJES]
         medicion.total = time.perf_counter() - medicion.inicio

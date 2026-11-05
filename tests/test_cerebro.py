@@ -428,3 +428,11 @@ def test_el_hud_explica_el_fallo_en_lenguaje_normal(monkeypatch, error, modelo, 
     cerebro.Cerebro([(ClienteFalso(error), modelo), (ClienteFalso(mensaje("ok")), "gemini")]).responder("s1", "hola")
     avisos = [texto for tipo, texto in eventos if tipo == "aviso"]
     assert len(avisos) == 1 and esperado in avisos[0]
+
+
+def test_no_repite_la_misma_confirmacion_dos_veces_seguidas():
+    historial = [{"role": "user", "content": "pausa"}, {"role": "assistant", "content": "Hecho."}]
+    for _ in range(20):
+        assert cerebro._sin_repetir("Hecho.", historial) in set(cerebro.CONFIRMACIONES) - {"Hecho."}
+    assert cerebro._sin_repetir("Hecho.", []) == "Hecho."
+    assert cerebro._sin_repetir("Volumen al 30 por ciento.", historial) == "Volumen al 30 por ciento."

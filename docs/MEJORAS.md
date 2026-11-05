@@ -49,7 +49,7 @@ El HUD solo muestra; no se puede tocar.
 Ya detallado en `PENDIENTES.md`, punto 1: app con PyInstaller, icono en la bandeja, ventana de configuración, instalador con Inno Setup y descarga desde GitHub Releases.
 
 ## 8. Naturalidad (6 → 7)
-- **B** Respuestas que varían más (no repetir la misma frase de confirmación dos veces seguidas).
+- ✅ **B** Respuestas que varían más (no repetir la misma frase de confirmación dos veces seguidas).
 - **B** Que recuerde de qué se hablaba en la última conversación al volver a abrirlo ("seguimos con lo del código de ayer").
 - **C** Voz propia en el PC (no en el Echo) con una voz neural gratis de Windows para los avisos del HUD.
 
