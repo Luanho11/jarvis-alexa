@@ -1,4 +1,4 @@
-"""Comprueba en Windows de verdad (GitHub Actions) que las librerías tienen lo que usa Jarvis, sin pulsar teclas ni mover ventanas."""
+"""Comprueba en Windows de verdad (GitHub Actions) que las librerías tienen lo que usa Jarvis, sin pulsar teclas, mover el mouse ni mover ventanas."""
 import os
 import sys
 
@@ -56,3 +56,16 @@ def test_carpetas_del_usuario_salen_del_registro():
 def test_menu_inicio_se_puede_leer():
     assert programas._carpetas_inicio()
     assert isinstance(programas._accesos_directos(), dict)
+
+
+def test_pyautogui_ve_la_pantalla_y_el_mouse_sin_moverlo():
+    import ctypes
+
+    import pyautogui
+
+    ancho, alto = pyautogui.size()
+    assert ancho > 0 and alto > 0
+    assert pyautogui.onScreen(*pyautogui.position())
+    # mouse.py da por hecho que pyautogui deja el proceso DPI-aware y que existe la rueda horizontal.
+    assert ctypes.windll.user32.IsProcessDPIAware()
+    assert callable(ctypes.windll.user32.mouse_event)

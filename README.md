@@ -1,11 +1,11 @@
 # Jarvis para Alexa
 
 Convierte tu Echo Dot en un asistente que conversa con una IA y controla tu PC con Windows 11:
-música y YouTube, volumen, programas, apagar el PC, Word, archivos y ventanas, búsquedas,
+música y YouTube, volumen, programas, apagar el PC, Word, archivos y ventanas, el mouse, búsquedas,
 noticias, agenda, recordatorios, memoria, modos y una ventana visual que puede mirar tu pantalla.
 Todo con planes gratuitos: no hace falta pagar nada.
 
-Versión 1.0.0 (cambios en `CHANGELOG.md`).
+Versión 1.1.0 (cambios en `CHANGELOG.md`).
 
 Cómo funciona: Alexa envía lo que dices a un pequeño programa en tu PC (a través de ngrok),
 el programa se lo pasa a la IA (Groq o Gemini) y Alexa lee la respuesta.
@@ -94,6 +94,15 @@ Di **"Alexa, abre mi jarvis"** y, cuando te salude, habla normal. Sigue escuchan
 cada respuesta; para terminar di "adiós" o "eso es todo". También vale de una vez:
 "Alexa, pide a mi jarvis que ponga música".
 
+Qué puede hacer por ti, en resumen:
+
+| Pídele | Cómo lo hace |
+|---|---|
+| **Escribir lo que dictas** | "Escribe hola mundo" lo teclea donde esté el cursor (`escribir_texto`); "añade al documento: ..." lo dicta al último Word; "escríbeme en Word una carta..." crea el documento y lo redacta. |
+| **Asesorarte** | Conversa y da su opinión ("¿qué portátil me compro?"); para algo largo ("investiga y compárame tres opciones") lo encarga al cerebro profundo y te avisa al terminar. |
+| **Buscar en internet** | "Busca quién ganó el partido" te responde hablando (`buscar_informacion`); "búscalo en Google" abre la búsqueda en el navegador. |
+| **Manejar el mouse** | Lo mueve, hace clic, doble clic o clic derecho, desplaza la página y hace clic en lo que nombres ("haz clic en Aceptar") mirando la pantalla. |
+
 Ejemplos de lo que puedes decir:
 
 - **Conversación**: "Cuéntame un chiste" · "¿Por qué el cielo es azul?" · "Dame una idea para cenar"
@@ -107,6 +116,11 @@ Ejemplos de lo que puedes decir:
 - **Archivos y ventanas**: "Abre la carpeta de descargas" · "Busca el archivo presupuesto" ·
   "Minimiza todo" · "Pon al frente la ventana de Excel" · "Maximiza la ventana" ·
   "Cierra esta ventana" · "Escribe hola mundo" · "Pulsa control más zeta"
+- **Mouse**: "Mueve el mouse a la derecha" · "Pon el ratón en el centro" · "Haz clic" ·
+  "Dale doble clic" · "Haz clic derecho" · "Baja la página" · "Sube un poco" ·
+  "Haz clic en Aceptar" · "Dale doble clic al archivo presupuesto" · "Haz clic en el buscador".
+  Para hacer clic en algo por su nombre mira la pantalla con Gemini (necesita su clave, tarda unos
+  segundos). Antes de hacer clic o desplazar, la ventana visual se esconde para no tapar nada.
 - **Word**: "Escríbeme en Word una carta para mi casero pidiendo arreglar la ducha" ·
   "Añade al documento: un saludo cordial" (se guarda en Documentos, carpeta Jarvis)
 - **Información**: "Busca quién ganó el partido de ayer" · "Dame las noticias" ·
@@ -204,10 +218,13 @@ conversación se minimiza a los pocos segundos y la siguiente vez vuelve a apare
   sobre el Echo (la música suena por los altavoces del PC).
 - **Freno de seguridad**: una web, una nota o algo en pantalla podría traer órdenes escondidas para la
   IA. Por eso, si en la misma petición Jarvis acaba de leer internet, la pantalla o tus notas, no escribe,
-  no pulsa teclas, no cierra programas ni ventanas, no apaga ni bloquea el PC, no borra citas y no cambia
+  no pulsa teclas, no hace clic, no cierra programas ni ventanas, no apaga ni bloquea el PC, no borra citas y no cambia
   su memoria: te lo dice y basta con que se lo pidas otra vez con tus palabras.
 - **Ver la pantalla envía capturas a Google** (Gemini) y gasta su cuota gratis; vigilar la
-  pantalla durante mucho rato puede agotarla. No lo uses con datos privados a la vista.
+  pantalla durante mucho rato puede agotarla. No lo uses con datos privados a la vista. "Haz clic en..."
+  también envía una captura.
+- **El mouse solo usa la pantalla principal**: con dos monitores no se mueve ni hace clic en el segundo.
+  Los encargos largos no usan el mouse (actuarían sobre lo que tengas delante mientras trabajas).
 - Los planes gratis tienen límites por minuto y por día; con las dos claves casi no se notan.
 - En modo desarrollo la skill solo funciona en **tu cuenta de Amazon** y tus dispositivos.
 - El **idioma de la skill debe coincidir con el de tu Echo**; si no, Alexa no la encuentra.
@@ -230,7 +247,7 @@ conversación se minimiza a los pocos segundos y la siguiente vez vuelve a apare
   límite gratis del minuto; espera un poco y repite. Pon las dos claves para que use la otra.
 - **No pausa ni cambia de canción**: actúa sobre lo que esté sonando en el PC; si no suena
   nada, no pasa nada.
-- **Groq dice que llegaste al límite (429)**: cada consulta con todas las funciones gasta unos 4.000
+- **Groq dice que llegaste al límite (429)**: cada consulta con todas las funciones gasta unos 4.600
   tokens y el plan gratis de Groq da 8.000 por minuto, así que con dos órdenes seguidas Jarvis pasa solo a
   Gemini. Es normal; si molesta, pon `PROVEEDOR_LLM=gemini` en `.env`.
 - **Cambiaste `requirements.txt`** o falla la instalación: borra la carpeta `.venv` y abre

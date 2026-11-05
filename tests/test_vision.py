@@ -81,3 +81,18 @@ def test_captura_reducida_en_jpeg(monkeypatch):
     monkeypatch.setitem(sys.modules, "PIL", SimpleNamespace(ImageGrab=SimpleNamespace(grab=lambda: imagen)))
     assert base64.b64decode(vision._capturar_jpeg_base64()) == b"jpeg"
     assert imagen.modo == "RGB" and imagen.tamano == (1280, 1280)
+
+
+def test_mirar_pantalla_pasa_las_opciones(monkeypatch, con_clave):
+    cliente = FalsoCliente('{"box_2d": []}')
+    _usar_cliente(monkeypatch, cliente)
+    formato = {"type": "json_object"}
+    assert vision.mirar_pantalla("localiza Aceptar", response_format=formato) == '{"box_2d": []}'
+    assert cliente.pedidos[0]["response_format"] is formato
+    assert cliente.pedidos[0]["model"] == vision.config.MODELO_GEMINI
+
+
+def test_mirar_pantalla_avisa_con_texto_para_el_usuario(monkeypatch, con_clave):
+    _usar_cliente(monkeypatch, FalsoCliente(error=openai.OpenAIError("sin cuota")))
+    with pytest.raises(vision.SinVision, match="No pude analizar la pantalla ahora."):
+        vision.mirar_pantalla("localiza Aceptar")

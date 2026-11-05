@@ -4,13 +4,13 @@ from urllib.parse import quote_plus
 
 import requests
 
-from acciones.sistema import teclado
+from acciones.sistema import pyautogui_sin_failsafe
 
 YOUTUBE = "https://www.youtube.com"
 
 
 def _pulsar(tecla: str, veces: int = 1) -> None:
-    teclado().press(tecla, presses=veces)
+    pyautogui_sin_failsafe().press(tecla, presses=veces)
 
 
 def subir_volumen(pasos: int = 5) -> str:
@@ -93,7 +93,7 @@ def retroceder(segundos: int = 10) -> str:
 
 
 def siguiente_video() -> str:
-    teclado().hotkey("shift", "n")
+    pyautogui_sin_failsafe().hotkey("shift", "n")
     return "Siguiente video."
 
 

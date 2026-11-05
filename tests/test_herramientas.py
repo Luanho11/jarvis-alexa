@@ -1,9 +1,10 @@
+import cerebro_profundo
 import herramientas
 
 
 def test_hay_una_herramienta_por_funcion():
     nombres = [h["function"]["name"] for h in herramientas.HERRAMIENTAS]
-    assert len(nombres) == len(set(nombres)) == 55
+    assert len(nombres) == len(set(nombres)) == 59
     assert set(nombres) == set(herramientas.FUNCIONES)
 
 
@@ -42,3 +43,9 @@ def test_listas_de_seguridad_nombran_herramientas_reales():
     assert herramientas.LECTURA <= herramientas.FUNCIONES.keys()
     assert herramientas.PELIGROSAS <= herramientas.FUNCIONES.keys()
     assert not herramientas.LECTURA & herramientas.PELIGROSAS
+
+
+def test_clics_frenados_tras_leer_y_mouse_fuera_del_cerebro_profundo():
+    mouse = {"mover_mouse", "desplazar", "hacer_clic", "clic_en"}
+    assert herramientas.PELIGROSAS & mouse == {"hacer_clic", "clic_en"}
+    assert mouse <= cerebro_profundo.EXCLUIDAS

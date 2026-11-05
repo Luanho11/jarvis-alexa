@@ -104,14 +104,19 @@ def _traer_al_frente() -> None:
         pass
 
 
-def _ocultar() -> None:
+def ocultar() -> bool:
+    """Minimiza el HUD ya; dice si había una ventana que esconder."""
+    if not config.HUD_ACTIVO:
+        return False
     try:
         ventana = _buscar_ventana(intentos=1)
         if ventana:
             _poner_encima(ventana, False)
             ventana.minimize()
+            return True
     except Exception:
         pass
+    return False
 
 
 def _cancelar_ocultar() -> None:
@@ -136,7 +141,7 @@ def ocultar_luego() -> None:
         return
     _cancelar_ocultar()
     with _candado:
-        _ocultador = threading.Timer(ESPERA_OCULTAR, _ocultar)
+        _ocultador = threading.Timer(ESPERA_OCULTAR, ocultar)
         _ocultador.daemon = True
         _ocultador.start()
 

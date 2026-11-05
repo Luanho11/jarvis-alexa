@@ -1,5 +1,15 @@
 # Cambios
 
+## 1.1.0 — 05/11/2026
+
+- Mouse por voz: mover (dirección o posición como "centro" o "esquina superior derecha"), clic, doble clic,
+  clic derecho y medio, scroll vertical y horizontal (muescas reales de Windows) y "haz clic en Aceptar":
+  Gemini localiza el elemento en una captura (caja `box_2d` normalizada 0–1000 en JSON) y el clic cae bien
+  con cualquier escalado DPI. El HUD se esconde antes de hacer clic o desplazar para no tapar ni recibirlo.
+- Seguridad: tras leer internet, la pantalla o las notas no hace clic en la misma petición; el cerebro
+  profundo no usa el mouse.
+- `vision.mirar_pantalla` reutilizable (captura + Gemini) para describir la pantalla y hacer clic.
+
 ## 1.0.0 — 05/11/2026
 
 Primera versión estable tras la auditoría completa (detalle en `docs/AUDITORIA.md`).

@@ -7,6 +7,7 @@ from acciones import (
     documentos,
     info,
     memoria,
+    mouse,
     notas,
     pc,
     programas,
@@ -38,6 +39,8 @@ BUSQUEDA = {"busqueda": _parametro("string", "Canción, artista o video.")}
 MINUTOS = {"minutos": _parametro("integer", "Margen, mínimo 1.")}
 SEGUNDOS = {"segundos": _parametro("integer", "Múltiplo de 10. Por defecto 10.")}
 NOMBRE_PROGRAMA = {"nombre": _parametro("string", "Ej. word, excel, chrome.")}
+DIRECCION = _parametro("string", "arriba, abajo, izquierda o derecha.")
+CLIC = {"boton": _parametro("string", "izquierdo, derecho o medio."), "veces": _parametro("integer", "2: doble clic.")}
 
 HERRAMIENTAS = [
     _herramienta("subir_volumen", "Sube el volumen del PC.", PASOS),
@@ -68,6 +71,19 @@ HERRAMIENTAS = [
     _herramienta("escribir_texto", "Escribe texto donde esté el cursor.", {"texto": TEXTO}, ("texto",)),
     _herramienta("atajo_teclado", "Pulsa teclas.", {"teclas": _parametro("string", "Ej. ctrl+w, alt+f4, win+d, enter.")}, ("teclas",)),
     _herramienta("estado_pc", "Uso de CPU, memoria y batería."),
+    _herramienta(
+        "mover_mouse",
+        "Mueve el mouse en una dirección o a una posición.",
+        {"direccion": DIRECCION, "pixeles": _parametro("integer"), "posicion": _parametro("string", "Ej. centro, esquina superior derecha.")},
+    ),
+    _herramienta("desplazar", "Scroll bajo el mouse.", {"direccion": DIRECCION, "cantidad": _parametro("integer", "Por defecto 5.")}),
+    _herramienta("hacer_clic", "Clic donde está el mouse.", CLIC),
+    _herramienta(
+        "clic_en",
+        "Busca en la pantalla lo descrito y le hace clic.",
+        {"descripcion": _parametro("string", "Ej. botón Aceptar."), **CLIC},
+        ("descripcion",),
+    ),
     _herramienta("poner_temporizador", "Temporizador que avisa en el PC.", {"minutos": _parametro("integer"), "motivo": TEXTO}, ("minutos",)),
     _herramienta(
         "agregar_evento",
@@ -141,7 +157,7 @@ LECTURA = {"buscar_informacion", "noticias", "describir_pantalla", "leer_nota", 
 # inyectada las usaría sin que el usuario lo pida. Si el usuario las pide en su siguiente frase, sí se ejecutan.
 PELIGROSAS = {
     "escribir_texto", "atajo_teclado", "cerrar_programa", "cerrar_ventana", "apagar", "reiniciar", "suspender",
-    "bloquear", "recordar", "olvidar_dato", "borrar_evento", "encargar_tarea",
+    "bloquear", "recordar", "olvidar_dato", "borrar_evento", "encargar_tarea", "hacer_clic", "clic_en",
 }
 BLOQUEADA = "Por seguridad no hago esto justo después de leer internet, la pantalla o las notas. Pide al usuario que lo confirme."
 
@@ -174,6 +190,10 @@ FUNCIONES = {
     "escribir_texto": sistema.escribir_texto,
     "atajo_teclado": sistema.atajo_teclado,
     "estado_pc": sistema.estado_pc,
+    "mover_mouse": mouse.mover_mouse,
+    "desplazar": mouse.desplazar,
+    "hacer_clic": mouse.hacer_clic,
+    "clic_en": mouse.clic_en,
     "poner_temporizador": recordatorios.poner_temporizador,
     "recordar": memoria.recordar,
     "olvidar_dato": memoria.olvidar_dato,

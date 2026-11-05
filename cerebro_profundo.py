@@ -24,8 +24,12 @@ EN_CURSO = "en curso"
 TERMINADA = "terminada"
 FALLIDA = "fallida"
 
-# Una tarea en segundo plano no debe recursar ni dejar el PC inservible sin que el usuario lo vea.
-EXCLUIDAS = {"encargar_tarea", "estado_tareas", "apagar", "reiniciar", "suspender", "bloquear"}
+# Una tarea en segundo plano no debe recursar ni dejar el PC inservible sin que el usuario lo vea. Tampoco usa
+# el mouse: actuaría sobre lo que haya en pantalla en ese momento, quizá mientras el usuario trabaja.
+EXCLUIDAS = {
+    "encargar_tarea", "estado_tareas", "apagar", "reiniciar", "suspender", "bloquear",
+    "mover_mouse", "desplazar", "hacer_clic", "clic_en",
+}
 
 registro = logging.getLogger(__name__)
 

@@ -9,6 +9,10 @@ import config
 ANCHO_MAXIMO = 1280
 
 
+class SinVision(Exception):
+    """Su texto es lo que se le dice al usuario."""
+
+
 def _capturar_jpeg_base64() -> str:
     from PIL import ImageGrab
 
@@ -19,17 +23,14 @@ def _capturar_jpeg_base64() -> str:
     return base64.b64encode(memoria.getvalue()).decode()
 
 
-def describir_pantalla(pregunta: str = "") -> str:
+def mirar_pantalla(instruccion: str, **opciones) -> str:
+    """Captura la pantalla principal y devuelve lo que Gemini responde a la instrucción sobre ella."""
     if not config.GEMINI_API_KEY:
-        return "Para ver la pantalla necesito la clave de Gemini."
+        raise SinVision("Para ver la pantalla necesito la clave de Gemini.")
     try:
         imagen = _capturar_jpeg_base64()
     except (ImportError, OSError):
-        return "No pude capturar la pantalla."
-    instruccion = (
-        "Esta es la pantalla de mi PC. Responde en español, en dos o tres frases cortas y sin formato, "
-        + (f"a esta pregunta: {pregunta}" if pregunta else "describiendo lo que se ve.")
-    )
+        raise SinVision("No pude capturar la pantalla.")
     cliente = openai.OpenAI(base_url=config.URL_GEMINI, api_key=config.GEMINI_API_KEY, timeout=15, max_retries=0)
     try:
         respuesta = cliente.chat.completions.create(
@@ -43,7 +44,20 @@ def describir_pantalla(pregunta: str = "") -> str:
                     ],
                 }
             ],
+            **opciones,
         )
     except openai.OpenAIError:
-        return "No pude analizar la pantalla ahora."
-    return (respuesta.choices[0].message.content or "No supe qué decir de la pantalla.").strip()
+        raise SinVision("No pude analizar la pantalla ahora.")
+    return respuesta.choices[0].message.content or ""
+
+
+def describir_pantalla(pregunta: str = "") -> str:
+    instruccion = (
+        "Esta es la pantalla de mi PC. Responde en español, en dos o tres frases cortas y sin formato, "
+        + (f"a esta pregunta: {pregunta}" if pregunta else "describiendo lo que se ve.")
+    )
+    try:
+        respuesta = mirar_pantalla(instruccion)
+    except SinVision as error:
+        return str(error)
+    return respuesta.strip() or "No supe qué decir de la pantalla."

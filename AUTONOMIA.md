@@ -2,7 +2,7 @@
 
 ## Objetivo
 Convertir un Echo Dot 5 en un asistente conversacional tipo Jarvis: conversa con un LLM,
-agenda, y controla el PC (música, YouTube, pausar, volumen, abrir cosas).
+agenda, y controla el PC (música, YouTube, pausar, volumen, abrir cosas, mouse).
 
 ## Cómo decide el supervisor
 1. Avanzar sin esperar al usuario cuando el paso es reversible; anotar la decisión en PROGRESO.md.
@@ -22,7 +22,8 @@ agenda, y controla el PC (música, YouTube, pausar, volumen, abrir cosas).
 - Todo gratis: plan gratuito de Groq/Gemini, dominio estático gratis de ngrok, skill en modo desarrollo.
 - Agenda: archivo local `agenda.json` (Google Calendar queda como mejora futura).
 - Seguridad: verificar firma y timestamp de Alexa (flask-ask-sdk) y el ID de la skill; HUD solo en local
-  (ngrok añade X-Forwarded-For); freno anti-inyección LECTURA → PELIGROSAS en los dos cerebros.
+  (ngrok añade X-Forwarded-For); freno anti-inyección LECTURA → PELIGROSAS en los dos cerebros
+  (incluye los clics); el cerebro profundo no usa el mouse.
 - Configuración por `.env`: GROQ_API_KEY, GEMINI_API_KEY, PROVEEDOR_LLM, ALEXA_SKILL_ID.
 
 ## Equipo
@@ -49,6 +50,15 @@ reproducir_en_youtube(busqueda: str) -> str   # reproduce el primer resultado (m
 abrir_web(url: str) -> str
 # abrir_programa, cerrar_programa: ver acciones/programas.py (cualquier app instalada)
 # sistema.py, web.py, recordatorios.py: ver cada módulo
+
+# acciones/mouse.py — pyautogui sin failsafe, solo pantalla principal; esconde el HUD antes de clic o scroll
+mover_mouse(direccion: str = "", pixeles: int = 100, posicion: str = "") -> str   # posicion: "centro", "esquina superior izquierda"...
+hacer_clic(boton: str = "izquierdo", veces: int = 1) -> str                        # izquierdo/derecho/medio, veces=2 doble clic
+desplazar(direccion: str = "abajo", cantidad: int = 5) -> str                      # muescas de rueda, también horizontal
+clic_en(descripcion: str, boton: str = "izquierdo", veces: int = 1) -> str        # Gemini da box_2d 0-1000 sobre la captura
+
+# acciones/vision.py
+mirar_pantalla(instruccion: str, **opciones) -> str   # captura + Gemini; lanza SinVision con el texto para el usuario
 
 # acciones/agenda.py — guarda en agenda.json
 agregar_evento(titulo: str, fecha_hora: str) -> str   # fecha_hora ISO 8601 local

@@ -1,5 +1,6 @@
 import json
 import threading
+from types import SimpleNamespace
 
 import pytest
 from flask import Flask
@@ -125,3 +126,18 @@ def test_mostrar_cancela_el_ocultado_pendiente(ventanas, monkeypatch):
     mostrar_y_esperar(listo)
     assert panel._ocultador is None
     assert not temporizador.is_alive() or temporizador.finished.is_set()
+
+
+def test_ocultar_minimiza_y_dice_si_habia_ventana(monkeypatch):
+    acciones = []
+    ventana = SimpleNamespace(minimize=lambda: acciones.append("minimizar"))
+    monkeypatch.setattr(panel.config, "HUD_ACTIVO", True)
+    monkeypatch.setattr(panel, "_poner_encima", lambda ventana, encima: acciones.append(("encima", encima)))
+    monkeypatch.setattr(panel, "_buscar_ventana", lambda intentos: ventana)
+    assert panel.ocultar() is True
+    assert acciones == [("encima", False), "minimizar"]
+    monkeypatch.setattr(panel, "_buscar_ventana", lambda intentos: None)
+    assert panel.ocultar() is False
+    monkeypatch.setattr(panel.config, "HUD_ACTIVO", False)
+    monkeypatch.setattr(panel, "_buscar_ventana", lambda intentos: ventana)
+    assert panel.ocultar() is False

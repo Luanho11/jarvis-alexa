@@ -82,10 +82,10 @@ def captura_pantalla() -> str:
     return "Guardé la captura en Imágenes, carpeta Jarvis."
 
 
-def teclado():
+def pyautogui_sin_failsafe():
     import pyautogui
 
-    # Su "failsafe" rechaza toda pulsación si el ratón quedó en una esquina de la pantalla:
+    # Su "failsafe" rechaza toda pulsación y todo movimiento si el ratón quedó en una esquina de la pantalla:
     # con Jarvis nadie mueve el ratón para pararlo, solo haría fallar las órdenes al azar.
     pyautogui.FAILSAFE = False
     return pyautogui
@@ -93,7 +93,7 @@ def teclado():
 
 def escribir_texto(texto: str) -> str:
     try:
-        pyautogui = teclado()
+        pyautogui = pyautogui_sin_failsafe()
     except ImportError:
         return "Solo puedo escribir en Windows."
     # pyautogui.write no escribe tildes ni eñes, por eso el texto no ASCII se pega desde el portapapeles.
@@ -109,7 +109,7 @@ def escribir_texto(texto: str) -> str:
 
 def atajo_teclado(teclas: str) -> str:
     try:
-        pyautogui = teclado()
+        pyautogui = pyautogui_sin_failsafe()
     except ImportError:
         return "Solo puedo usar el teclado en Windows."
     combinacion = [NOMBRES_TECLAS.get(tecla.strip(), tecla.strip()) for tecla in teclas.lower().split("+")]
