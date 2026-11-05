@@ -412,3 +412,19 @@ def test_el_prompt_manda_a_las_herramientas_exactas():
     texto = cerebro.prompt_sistema()
     assert "programar_tarea" in texto and "agregar_evento" in texto
     assert "leer_portapapeles" in texto and "calcular" in texto and "convertir_unidad" in texto
+
+
+@pytest.mark.parametrize(
+    ("error", "modelo", "esperado"),
+    [
+        (limite_429(), "openai/gpt-oss-120b", "cuota gratis de Groq"),
+        (openai.AuthenticationError("401", response=httpx2.Response(401, request=httpx2.Request("POST", "https://x")), body=None), "gemini-3.5-flash-lite", "clave de Gemini"),
+        (error_tiempo(), "openai/gpt-oss-120b", "Groq no responde"),
+    ],
+)
+def test_el_hud_explica_el_fallo_en_lenguaje_normal(monkeypatch, error, modelo, esperado):
+    eventos = []
+    monkeypatch.setattr(cerebro.panel, "emitir", lambda tipo, texto="": eventos.append((tipo, texto)))
+    cerebro.Cerebro([(ClienteFalso(error), modelo), (ClienteFalso(mensaje("ok")), "gemini")]).responder("s1", "hola")
+    avisos = [texto for tipo, texto in eventos if tipo == "aviso"]
+    assert len(avisos) == 1 and esperado in avisos[0]

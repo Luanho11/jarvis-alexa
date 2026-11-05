@@ -143,6 +143,18 @@ def _pausa_por_limite(error: openai.RateLimitError) -> float:
     return min(max(espera, 1), MAX_PAUSA_LIMITE)
 
 
+def _explicar_fallo(error: openai.OpenAIError, modelo: str) -> str:
+    """Lo que se ve en el HUD cuando un proveedor falla, dicho para quien no lee la consola."""
+    proveedor = "Gemini" if "gemini" in modelo.lower() else "Groq"
+    if isinstance(error, openai.RateLimitError):
+        return f"Se acabó por ahora la cuota gratis de {proveedor}; sigo con el respaldo."
+    if isinstance(error, (openai.AuthenticationError, openai.PermissionDeniedError)):
+        return f"La clave de {proveedor} no funciona: revísala en el archivo .env."
+    if isinstance(error, openai.APIConnectionError):
+        return f"{proveedor} no responde: revisa la conexión a internet."
+    return f"{proveedor} dio un error; pruebo con el respaldo."
+
+
 def _recientes(historial: list[dict]) -> list[dict]:
     """El último intercambio y los anteriores que quepan en MAX_CARACTERES_HISTORIAL, empezando por el usuario."""
     desde = max(len(historial) - 2, 0)
@@ -301,6 +313,7 @@ class Cerebro:
                 )
             except openai.OpenAIError as error:
                 registro.warning("LLM %s falló en %s: %s", modelo, _ms(time.perf_counter() - inicio), type(error).__name__)
+                panel.emitir("aviso", _explicar_fallo(error, modelo))
                 if isinstance(error, openai.RateLimitError):
                     self.pausados[modelo] = time.monotonic() + _pausa_por_limite(error)
                 ultimo_error = error
