@@ -27,8 +27,12 @@ const onda = new SiriWave({
   speed: 0.08,
 });
 
+const MS_POR_LETRA = 65;
+const reducirMovimiento = matchMedia("(prefers-reduced-motion: reduce)");
+
 let vueltaAEscuchar;
 let finAviso;
+let escritura;
 
 function ponerEstado(estado) {
   document.body.dataset.estado = estado;
@@ -45,17 +49,36 @@ function mostrarFinal() {
 // Un aviso o comentario que aparece debajo encoge la respuesta y movería lo visible.
 new ResizeObserver(mostrarFinal).observe(elementos.respuesta);
 
+// La respuesta aparece palabra a palabra al ritmo de la voz, salvo si Windows pide reducir el movimiento.
+function escribirPocoAPoco(texto, duracion) {
+  clearInterval(escritura);
+  const palabras = texto.split(" ");
+  if (reducirMovimiento.matches || palabras.length < 4) {
+    elementos.respuesta.textContent = texto;
+    mostrarFinal();
+    return;
+  }
+  let mostradas = 0;
+  escritura = setInterval(() => {
+    mostradas += 1;
+    elementos.respuesta.textContent = palabras.slice(0, mostradas).join(" ");
+    mostrarFinal();
+    if (mostradas === palabras.length) clearInterval(escritura);
+  }, duracion / palabras.length);
+}
+
 function hablar(texto) {
-  elementos.respuesta.textContent = texto;
-  mostrarFinal();
+  // Alexa lee unas 15 letras por segundo; al terminar vuelve a escuchar.
+  const duracion = Math.max(2000, texto.length * MS_POR_LETRA);
+  escribirPocoAPoco(texto, duracion);
   ponerEstado("hablando");
   clearTimeout(vueltaAEscuchar);
-  // Alexa lee unas 15 letras por segundo; al terminar vuelve a escuchar.
-  vueltaAEscuchar = setTimeout(() => ponerEstado("escuchando"), Math.max(2000, texto.length * 65));
+  vueltaAEscuchar = setTimeout(() => ponerEstado("escuchando"), duracion);
 }
 
 function escucharUsuario(texto) {
   clearTimeout(vueltaAEscuchar);
+  clearInterval(escritura);
   elementos.usuario.textContent = texto;
   elementos.respuesta.textContent = "";
   elementos.acciones.replaceChildren();

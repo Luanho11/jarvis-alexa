@@ -229,4 +229,5 @@ if __name__ == "__main__":
         raise SystemExit("Falta GROQ_API_KEY o GEMINI_API_KEY en el archivo .env")
     iniciar_vigilante()
     calculo.precargar()
+    panel.preparar()
     crear_app(cerebro).run(port=5000)

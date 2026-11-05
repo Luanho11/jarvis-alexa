@@ -205,3 +205,11 @@ def test_texto_vacio_o_sin_cerebro_se_rechaza(cliente, monkeypatch):
     assert cliente.post("/hud/escribir", json={"texto": "hola"}).status_code == 400
     monkeypatch.setattr(panel, "_responder", lambda texto: "x")
     assert cliente.post("/hud/escribir", json={"texto": "   "}).status_code == 400
+
+
+def test_preparar_abre_y_luego_esconde(monkeypatch):
+    hechos = []
+    monkeypatch.setattr(panel, "mostrar", lambda: hechos.append("mostrar"))
+    monkeypatch.setattr(panel, "ocultar_luego", lambda: hechos.append("ocultar_luego"))
+    panel.preparar()
+    assert hechos == ["mostrar", "ocultar_luego"]

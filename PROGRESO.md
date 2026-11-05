@@ -31,3 +31,4 @@
 - 05/11 Supervisor: autoevaluación 1.3.0 rehecha con diseño, fluidez e interactividad: 6,2/10 (docs/EVALUACION.md).
 - 05/11 Supervisor: plan de mejoras (interactividad, UX, UI, fluidez, calidad, velocidad, seguridad) en docs/MEJORAS.md; sin implementar.
 - 05/11 Dev HUD: botones (pausa, anular apagado, no vigilar, ocultar) y caja "Escríbele a Jarvis" con el mismo cerebro; órdenes solo en JSON desde el propio PC (bloquea otras webs e internet). 912 tests OK.
+- 05/11 Dev HUD: se abre minimizado al arrancar (la 1.ª orden ya no espera a Edge), aparece con fundido, respuesta palabra a palabra al ritmo de la voz, colores de estado con transición y respeta "reducir movimiento" de Windows. 913 tests OK.

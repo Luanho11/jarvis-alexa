@@ -162,6 +162,12 @@ def mostrar() -> None:
     threading.Thread(target=_traer_al_frente, daemon=True).start()
 
 
+def preparar() -> None:
+    """Abre el HUD al arrancar y lo minimiza: así la primera orden lo muestra al momento, sin esperar a que abra Edge."""
+    mostrar()
+    ocultar_luego()
+
+
 def ocultar_luego() -> None:
     global _ocultador
     if not config.HUD_ACTIVO:
