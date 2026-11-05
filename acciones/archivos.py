@@ -67,7 +67,7 @@ def abrir_carpeta(nombre: str) -> str:
     return f"Abrí {nombre}."
 
 
-def _buscar(nombre: str) -> list[Path]:
+def buscar_rutas(nombre: str) -> list[Path]:
     limite = time.monotonic() + SEGUNDOS_BUSQUEDA
     encontrados = []
     for clave in CARPETAS_BUSQUEDA:
@@ -84,7 +84,7 @@ def _buscar(nombre: str) -> list[Path]:
 
 def buscar_archivo(nombre: str) -> str:
     nombre = normalizar(nombre)
-    encontrados = _buscar(nombre)
+    encontrados = buscar_rutas(nombre)
     if not encontrados:
         return f"No encontré ningún archivo con {nombre}."
     exactos = [archivo for archivo in encontrados if normalizar(archivo.stem) == nombre]

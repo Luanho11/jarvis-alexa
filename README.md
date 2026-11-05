@@ -131,6 +131,16 @@ Ejemplos de lo que puedes decir:
 - **Memoria**: "Recuerda que mi equipo es el América" · "Olvida lo de mi equipo"
 - **Modos**: "Activa el modo estudio" · "¿Qué modos tengo?". Se definen en `rutinas.json`
   (copia `rutinas.ejemplo.json` y cámbialo a tu gusto).
+- **Formas de hablar**: "Modo profesor" · "Modo traductor" · "Modo entrenador" · "Modo normal"
+  (ver [Formas de hablar](#formas-de-hablar-como-los-gems)).
+- **Leer documentos y webs**: "Léeme el contrato" · "¿Qué dice el último PDF de descargas?" ·
+  "Resúmeme el contrato en Word" · "¿De qué trata elpais.com/internacional?" · "Sigue desde la página 4".
+  Lee PDF, Word (.docx), .txt, .md y .csv de Documentos, Descargas y Escritorio, y páginas web.
+  Si hay varios con ese nombre te pregunta cuál. Un PDF escaneado (fotos de páginas) no tiene
+  texto: ábrelo y pídele que mire la pantalla. Por seguridad nunca abre direcciones de tu red local
+  ni de tu PC (router, la ventana visual...). "Resúmelo entero" lo encarga al cerebro profundo.
+- **Correo** (si configuras [Google](#google-gmail-y-calendar-gratis-opcional)): "¿Tengo correos nuevos?" ·
+  "Léeme mis últimos correos". Solo lee: no puede enviar ni borrar.
 - **Pantalla**: "¿Qué hay en mi pantalla?" · "¿Qué error sale aquí?" ·
   "Vigila mi pantalla diez minutos" · "Deja de vigilar"
 
@@ -198,6 +208,21 @@ Para cambiar su forma de ser, copia `persona.ejemplo.md` como `persona.md` y esc
 quieres que sea (más formal, más bromista, con otro nombre...). Se aplica en la siguiente frase,
 sin reiniciar. Si borras `persona.md`, vuelve la personalidad de ejemplo.
 
+### Formas de hablar (como los Gems)
+
+Además de su personalidad, Jarvis puede adoptar un papel durante la conversación: di
+**"modo profesor"** (explica paso a paso y te pregunta para comprobar), **"modo entrenador"**
+(rutinas sin aparatos), **"modo entrevistador"** (simula una entrevista de trabajo y te corrige),
+**"modo cocinero"** (recetas paso a paso con lo que tengas) o **"modo traductor"** (traduce al
+inglés lo que digas y el Echo lo pronuncia en inglés; con acento, porque la voz de Alexa en español
+no tiene voz inglesa) o **"modo Xara"** (sarcástica, directa y honesta, con jerga peruana cuando encaja;
+no te da la razón por darla y te empuja si te estás saboteando). **"Modo normal"** vuelve a lo de
+siempre, y también al terminar la conversación.
+
+Cada forma es un archivo de la carpeta `personas` (2-6 líneas). Para crear la tuya, copia uno,
+renómbralo (por ejemplo `pirata.md`) y escribe cómo debe hablar; "modo pirata" la activa. Solo se
+usan los primeros 800 caracteres. Si una rutina de `rutinas.json` se llama igual, gana la rutina.
+
 ## Que el Echo hable solo (opcional, Voice Monkey)
 
 Una skill no puede hablar si no le hablas antes. Con [Voice Monkey](https://voicemonkey.io)
@@ -220,6 +245,54 @@ Jarvis lleva la cuenta en `echo_uso.json` y no pasa de **150 avisos al mes** (`L
 deja margen para tus pruebas); cuando quedan pocos, lo dice al final del aviso. Los comentarios
 de "vigila mi pantalla" nunca van al Echo: uno cada 20 segundos gastaría el mes en una tarde.
 Para apagarlo sin borrar el token, pon `AVISOS_EN_ECHO=no`.
+
+## Google: Gmail y Calendar gratis (opcional)
+
+Jarvis puede leer tus correos sin leer y usar tu Google Calendar con un pequeño script que corre
+en tu propia cuenta de Google (Apps Script): es gratis, no caduca y no necesita tarjeta. Solo lee
+Gmail (permiso de solo lectura: **no puede enviar ni borrar correos**; lee remitente, asunto y un
+fragmento, nunca adjuntos) y lee o crea eventos en tu calendario principal.
+
+1. Entra en [script.google.com](https://script.google.com) con tu cuenta y pulsa **Nuevo proyecto**.
+   Arriba, cambia "Proyecto sin título" por `Jarvis`.
+2. En **Configuración del proyecto** (el engranaje de la izquierda), marca **Mostrar el archivo de
+   manifiesto "appsscript.json" en el editor**.
+3. Vuelve al **Editor** (`< >`). Abre `appsscript.json`, borra todo y pega el contenido de
+   `google/appsscript.json` de la carpeta de Jarvis. Si no vives en México cambia `timeZone`
+   (por ejemplo `America/Bogota` o `Europe/Madrid`).
+4. Abre `Código.gs`, borra todo, pega el contenido de `google/Codigo.gs` y guarda (Ctrl+S).
+5. Crea una clave secreta. En la carpeta de Jarvis, en una terminal:
+   ```
+   .venv\Scripts\python -c "import secrets; print(secrets.token_urlsafe(32))"
+   ```
+6. En **Configuración del proyecto** → **Propiedades del script** → **Añadir propiedad del script**:
+   nombre `CLAVE` y como valor la clave del paso anterior. Guarda.
+7. Arriba a la derecha, **Implementar** → **Nueva implementación** → engranaje → **Aplicación web**.
+   "Ejecutar como": **Yo**. "Quién tiene acceso": **Cualquier usuario**. Pulsa **Implementar**.
+8. Pulsa **Autorizar acceso** y elige tu cuenta. Google avisa de que la aplicación no está verificada
+   porque es tuya: **Configuración avanzada** → **Ir a Jarvis (no seguro)** → **Permitir**. Pide ver tu
+   correo (solo lectura) y gestionar tu calendario.
+9. Copia la **URL de la aplicación web** (termina en `/exec`) y añade a tu `.env`:
+   ```
+   GOOGLE_SCRIPT_URL=https://script.google.com/macros/s/.../exec
+   GOOGLE_SCRIPT_CLAVE=la clave del paso 5
+   ```
+   Reinicia `iniciar.bat` y prueba: "¿tengo correos nuevos?".
+
+Con Google configurado, "¿qué tengo mañana?" junta tu agenda del PC y la de Google (sin repetir) y
+cada evento nuevo se guarda en el PC y, en segundo plano, también en Google. Si Google no responde,
+sigue con la agenda del PC sin decir nada. Los avisos a la hora del evento y "borra la cita" solo
+funcionan con los eventos guardados por Jarvis en el PC. Para usar Google solo para el correo,
+pon `GOOGLE_AGENDA=no`.
+
+- **Seguridad**: cualquiera que tenga la URL recibe solo "clave incorrecta" si no sabe la clave.
+  Trátala como una contraseña: si la compartiste, cambia la propiedad `CLAVE` y tu `.env`.
+- **Si cambias el script**: **Implementar** → **Gestionar implementaciones** → lápiz → Versión:
+  **Nueva versión** → **Implementar**. La URL no cambia.
+- **Cuotas gratis de Google**: miles de lecturas de correo y de eventos al día, de sobra para Jarvis.
+- **"Google no devolvió datos"**: en el paso 7 "Quién tiene acceso" no quedó en "Cualquier usuario".
+  **"Google rechazó la clave"**: la de `.env` y la propiedad `CLAVE` no son iguales (o tiene menos de
+  20 caracteres).
 
 ## Interfaz visual
 
