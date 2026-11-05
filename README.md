@@ -181,29 +181,38 @@ las dos respuestas seguidas.
 
 ## Memoria y aprendizaje
 
-Jarvis te va conociendo, sin pagar nada y sin que tus datos salgan de tu PC (salvo lo que ya viaja
-en cada conversación al LLM gratis, Groq o Gemini):
+Jarvis te va conociendo solo, sin pagar nada y sin que tus datos salgan de tu PC (salvo lo que ya viaja
+en cada conversación al LLM gratis, Groq o Gemini). Cómo lo hacen ChatGPT, Gemini y Claude y qué se copió:
+`docs/MEMORIA.md`.
 
-- **Perfil** (`memoria.json`): tu nombre, datos personales, gustos, personas importantes, rutinas y
-  cosas que prefieres evitar. Lo guarda cuando le cuentas algo duradero ("me llamo Ana", "mi hija se
-  llama Lucía", "no me gusta el reguetón") o le dices "recuerda que...". Guarda hasta 50 datos: si
-  le dices algo más completo sustituye al dato viejo y, si se llena, olvida primero lo más antiguo de lo
-  menos importante (nunca tu nombre). La memoria antigua (una lista de frases) se convierte sola.
+- **Perfil** (`memoria.json`), **sin límite de datos**: tu nombre, datos personales, gustos, personas
+  importantes, rutinas y cosas que prefieres evitar. No hace falta pedirle que guarde nada: si dices
+  "vivo en Lima", "mi hermana se llama Marta", "me encanta el jazz" o "no me gusta el reguetón", lo apunta
+  al momento (sin gastar IA). También vale "recuerda que...". No aprende de preguntas, de cosas del momento
+  ("me gusta esta canción") ni de lo que le dictas, y no guarda contraseñas, números de tarjeta o cuenta ni
+  datos de salud.
+- **Se corrige solo**: "ahora vivo en Cusco" sustituye a Lima, "tengo 31 años" a los 30, "ya no trabajo en
+  el banco" lo borra y un dato más completo reemplaza al corto. Cada dato guarda cuándo lo supo, cuándo se lo
+  confirmaste (y cuántas veces) y cuándo le sirvió.
 - **Costumbres** (`uso.json`): solo contadores de lo que le pides: la música y los artistas, los programas
   que abres, el volumen que sueles poner, tus modos y a qué hora del día le hablas. Así sabe, por ejemplo,
   que sueles escuchar Bad Bunny o poner el volumen al 30 %. **No guarda** lo que le pides escribir o
   dictar, lo que buscas en internet, tus notas ni capturas. Lo reciente pesa más que lo de hace meses.
 - **Conversaciones** (`diario.json`): al terminar una conversación de al menos dos frases, en segundo
-  plano y con una sola consulta al LLM, apunta de qué hablasteis en una frase y añade al perfil lo nuevo
-  que contaste de ti. Guarda los últimos 30 días; así puede decirte "la última vez hablamos de tu viaje".
-- En cada respuesta Jarvis lee un resumen corto de todo esto (unos 1.500 caracteres como máximo, para no
-  gastar la cuota gratis); leerlo tarda menos de un milisegundo.
+  plano y con una sola consulta al LLM, apunta de qué hablasteis en una frase, añade lo nuevo que contaste
+  de ti y quita lo que dejó de ser cierto. Guarda un año; así puede decirte "hace un mes hablamos de tu viaje".
+- **Cuánto lee en cada respuesta**: aunque recuerde miles de cosas, solo le llegan unos 1.500 caracteres
+  (para no gastar la cuota gratis): tu nombre, lo que hay que evitar y lo más relacionado con lo que le
+  acabas de pedir, lo más importante, lo que más le has confirmado y lo más reciente. Elegirlo tarda unos
+  milisegundos.
 
-Para verlo o borrarlo:
+Para verlo, pausarlo o borrarlo:
 
 - "¿Qué sabes de mí?" te lo cuenta. Los tres archivos están en la carpeta de Jarvis y se pueden abrir
   con el Bloc de notas (si rompes `memoria.json` al editarlo, Jarvis sigue funcionando sin memoria y no
   lo sobrescribe hasta que lo arregles).
+- "Esta conversación es privada" (o "no aprendas de esto"): hasta que termine la conversación no apunta
+  nada de lo que digas ni la resume, como el chat temporal de ChatGPT.
 - "Olvida que vivo en Lima" borra ese dato. "Olvida todo lo que sabes de mí" te pide confirmar: di
   **"sí, bórralo todo"** y borra los tres archivos (tus notas y tu agenda no se tocan). También puedes
   borrarlos a mano con Jarvis cerrado.

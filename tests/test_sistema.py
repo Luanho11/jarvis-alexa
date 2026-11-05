@@ -1,3 +1,4 @@
+import ctypes
 import sys
 from types import SimpleNamespace
 
@@ -85,29 +86,74 @@ def test_captura_pantalla_va_a_la_carpeta_imagenes_real(monkeypatch, tmp_path):
 def teclado(monkeypatch):
     acciones = []
     falso = SimpleNamespace(
-        KEYBOARD_KEYS=["ctrl", "alt", "f4", "win", "d", "v", "w", "enter"],
-        write=lambda texto: acciones.append(("write", texto)),
+        KEYBOARD_KEYS=["ctrl", "alt", "f4", "win", "d", "v", "w", "enter", "shift", "right"],
         hotkey=lambda *teclas: acciones.append(("hotkey", teclas)),
     )
     monkeypatch.setitem(sys.modules, "pyautogui", falso)
-    monkeypatch.setitem(sys.modules, "pyperclip", SimpleNamespace(copy=lambda texto: acciones.append(("copy", texto))))
+    monkeypatch.setattr(sistema, "soltar_foco_del_hud", lambda: acciones.append(("hud",)))
     return acciones
 
 
-def test_escribir_ascii_teclea(teclado):
-    assert sistema.escribir_texto("hola") == "Escrito."
-    assert teclado == [("write", "hola")]
+@pytest.fixture
+def send_input(monkeypatch):
+    envios = []
+
+    def enviar(cuantas, entradas, tamano):
+        envios.append([(e.type, e.evento.ki.wVk, e.evento.ki.wScan, e.evento.ki.dwFlags) for e in entradas])
+        return cuantas
+
+    user32 = SimpleNamespace(SendInput=enviar)
+    monkeypatch.setattr(sistema.ctypes, "windll", SimpleNamespace(user32=user32), raising=False)
+    monkeypatch.setattr(sistema, "soltar_foco_del_hud", lambda: envios.append("hud"))
+    return envios
 
 
-def test_escribir_con_tildes_pega(teclado):
-    sistema.escribir_texto("canción")
-    assert teclado == [("copy", "canción"), ("hotkey", ("ctrl", "v"))]
+UNICODE, SUELTA = sistema.KEYEVENTF_UNICODE, sistema.KEYEVENTF_KEYUP
+
+
+def test_pulsaciones_unicode_sin_depender_del_teclado():
+    assert sistema._pulsaciones("ñ@") == [(0, 0xF1, UNICODE), (0, 0xF1, UNICODE | SUELTA), (0, 0x40, UNICODE), (0, 0x40, UNICODE | SUELTA)]
+
+
+def test_saltos_de_linea_y_tabuladores_son_teclas():
+    assert sistema._pulsaciones("\r\n\t") == [(0x0D, 0, 0), (0x0D, 0, SUELTA), (0x09, 0, 0), (0x09, 0, SUELTA)]
+
+
+def test_un_emoji_va_en_dos_unidades_utf16():
+    assert [unidad for _, unidad, flags in sistema._pulsaciones("😀") if not flags & SUELTA] == [0xD83D, 0xDE00]
+
+
+def test_la_entrada_mide_lo_que_espera_send_input():
+    assert ctypes.sizeof(sistema._Entrada) == (40 if ctypes.sizeof(ctypes.c_void_p) == 8 else 28)
+
+
+def test_escribir_con_tildes_suelta_el_hud_y_envia_todo(send_input):
+    assert sistema.escribir_texto("Hola ñandú") == "Escrito."
+    assert send_input[0] == "hud"
+    teclas = send_input[1]
+    assert len(teclas) == 20
+    assert {tipo for tipo, *_ in teclas} == {sistema.INPUT_KEYBOARD}
+    assert "".join(chr(scan) for _, _, scan, flags in teclas if flags == UNICODE) == "Hola ñandú"
+
+
+def test_un_texto_largo_va_por_partes(send_input, monkeypatch):
+    monkeypatch.setattr(sistema, "CARACTERES_POR_ENVIO", 4)
+    sistema.escribir_texto("abcdefghij")
+    assert [len(envio) for envio in send_input[1:]] == [8, 8, 4]
+
+
+def test_escribir_con_el_teclado_bloqueado(send_input, monkeypatch):
+    monkeypatch.setattr(sistema.ctypes.windll.user32, "SendInput", lambda cuantas, entradas, tamano: 0)
+    assert sistema.escribir_texto("hola") == "No pude escribir: Windows tiene el teclado bloqueado ahora."
 
 
 def test_atajo_traduce_y_pulsa(teclado):
     assert sistema.atajo_teclado("Control + W") == "Hecho."
     sistema.atajo_teclado("windows+d")
-    assert teclado == [("hotkey", ("ctrl", "w")), ("hotkey", ("win", "d"))]
+    sistema.atajo_teclado("mayús+flecha derecha")
+    pulsadas = [accion for accion in teclado if accion != ("hud",)]
+    assert pulsadas == [("hotkey", ("ctrl", "w")), ("hotkey", ("win", "d")), ("hotkey", ("shift", "right"))]
+    assert teclado[0] == ("hud",)
 
 
 def test_atajo_tecla_desconocida(teclado):
@@ -115,10 +161,22 @@ def test_atajo_tecla_desconocida(teclado):
     assert teclado == []
 
 
-def test_sin_pyautogui(monkeypatch):
+def test_sin_windows(monkeypatch):
     monkeypatch.setitem(sys.modules, "pyautogui", None)
+    monkeypatch.delattr(sistema.ctypes, "windll", raising=False)
     assert "Windows" in sistema.escribir_texto("hola")
     assert "Windows" in sistema.atajo_teclado("alt+f4")
+
+
+@pytest.mark.parametrize("titulo, escondido", [("Jarvis HUD - Perfil 1 - Microsoft Edge", True), ("Bloc de notas", False)])
+def test_suelta_el_foco_solo_si_lo_tiene_el_hud(monkeypatch, titulo, escondido):
+    esperas, ocultados = [], []
+    monkeypatch.setitem(sys.modules, "pygetwindow", SimpleNamespace(getActiveWindow=lambda: SimpleNamespace(title=titulo)))
+    monkeypatch.setattr(sistema.panel, "ocultar", lambda: ocultados.append(True) or True)
+    monkeypatch.setattr(sistema.time, "sleep", esperas.append)
+    sistema.soltar_foco_del_hud()
+    assert bool(ocultados) == escondido
+    assert esperas == ([sistema.ESPERA_HUD] if escondido else [])
 
 
 def test_estado_pc_con_y_sin_bateria(monkeypatch):
