@@ -1,18 +1,18 @@
-# Plan de mejoras tras la autoevaluación 1.3.0 (6,2/10)
+# Plan de mejoras tras la autoevaluación 1.3.0 (6,2/10, ahora 6,5)
 
-Cada mejora sale de un punto débil de `docs/EVALUACION.md`. Prioridad: **A** = sube más la nota con menos trabajo, **B** = importante, **C** = después. Nada de esto está hecho todavía.
+Cada mejora sale de un punto débil de `docs/EVALUACION.md`. Prioridad: **A** = sube más la nota con menos trabajo, **B** = importante, **C** = después. Lo marcado con ✅ ya está hecho y subido.
 
 ## 1. Interactividad (3 → 8)
 El HUD solo muestra; no se puede tocar.
-- **A** Barra de botones en el HUD: ⏸ Parar (corta lo que está diciendo/haciendo), 🔁 Repetir, ✕ Cancelar acción pendiente (apagado, programada), 🔇 Silenciar vigilancia. Nuevo `POST /hud/orden` en `panel.py`, solo local, igual que `/hud/eventos`.
-- **A** Caja de texto "Escríbele a Jarvis" en el HUD: misma ruta que la voz (`rapido.py` → `cerebro.py`), útil cuando no quieres hablar o el Echo no entendió.
+- ✅ **A** Barra de botones en el HUD: ⏸ Parar (corta lo que está diciendo/haciendo), 🔁 Repetir, ✕ Cancelar acción pendiente (apagado, programada), 🔇 Silenciar vigilancia. Nuevo `POST /hud/orden` en `panel.py`, solo local, igual que `/hud/eventos`.
+- ✅ **A** Caja de texto "Escríbele a Jarvis" en el HUD: misma ruta que la voz (`rapido.py` → `cerebro.py`), útil cuando no quieres hablar o el Echo no entendió.
 - **B** Historial desplegable de la conversación de hoy (las últimas 20 líneas), con botón copiar en cada respuesta.
 - **B** Tarjetas de acción clicables: si abrió un vídeo, archivo o web, la tarjeta lo abre otra vez; si creó un recordatorio, botón "borrar".
 - **C** Atajos de teclado globales: `Ctrl+Alt+J` muestra/oculta el HUD, `Esc` lo minimiza.
 
 ## 2. Intuitividad y UX (sin nota propia, afecta a naturalidad e instalación)
-- **A** Pantalla de bienvenida la primera vez: 5 frases de ejemplo ("pon música de…", "qué hay en mi pantalla", "recuérdame…") que se pueden pulsar para probar.
-- **A** Mensajes de error en lenguaje normal en el HUD y en la voz: hoy "falta la clave de Groq" solo sale en la consola negra. Mostrar qué pasó y qué hacer en una línea.
+- ✅ **A** Pantalla de bienvenida la primera vez: 5 frases de ejemplo ("pon música de…", "qué hay en mi pantalla", "recuérdame…") que se pueden pulsar para probar.
+- ✅ **A** Mensajes de error en lenguaje normal en el HUD y en la voz: hoy "falta la clave de Groq" solo sale en la consola negra. Mostrar qué pasó y qué hacer en una línea.
 - **A** Indicador claro de estado: escuchando / pensando / haciendo / hablando, con color distinto y texto; y aviso visible cuando está usando el respaldo (Gemini) porque Groq se agotó.
 - **B** Confirmaciones visibles para lo peligroso (apagar, cerrar programa, clic): tarjeta con cuenta atrás y botón Cancelar, además de la voz.
 - **B** "¿Qué puedes hacer?" responde con 6 categorías cortas en vez de una lista larga, y el HUD muestra la lista completa agrupada.
@@ -26,9 +26,9 @@ El HUD solo muestra; no se puede tocar.
 - **C** Revisar contraste y tamaño mínimo de texto (accesibilidad AA).
 
 ## 4. Fluidez y animaciones (5 → 8)
-- **A** No abrir Edge en cada orden: abrirlo una vez al arrancar y solo mostrar/ocultar la ventana. Quita el salto y el retraso.
-- **A** Transiciones de entrada y salida (aparecer con fundido + escala 0,96→1 en 200 ms; ocultar en 150 ms) y respetar "reducir movimiento" de Windows (`prefers-reduced-motion`).
-- **B** Texto de la respuesta que aparece al ritmo de la voz en vez de entero de golpe.
+- ✅ **A** No abrir Edge en cada orden: abrirlo una vez al arrancar y solo mostrar/ocultar la ventana. Quita el salto y el retraso.
+- ✅ **A** Transiciones de entrada y salida (aparecer con fundido + escala 0,96→1 en 200 ms; ocultar en 150 ms) y respetar "reducir movimiento" de Windows (`prefers-reduced-motion`).
+- ✅ **B** Texto de la respuesta que aparece al ritmo de la voz en vez de entero de golpe.
 - **B** La onda reacciona al estado (plana en espera, viva al hablar) con transición suave, sin saltos de amplitud.
 - **C** Medir FPS y CPU del HUD en tu PC; objetivo 60 fps y <3 % de CPU en espera (pausar animaciones cuando está oculto).
 

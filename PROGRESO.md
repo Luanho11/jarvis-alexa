@@ -34,3 +34,4 @@
 - 05/11 Dev HUD: se abre minimizado al arrancar (la 1.ª orden ya no espera a Edge), aparece con fundido, respuesta palabra a palabra al ritmo de la voz, colores de estado con transición y respeta "reducir movimiento" de Windows. 913 tests OK.
 - 05/11 Dev HUD: si Groq o Gemini fallan, el HUD lo explica en lenguaje normal (cuota agotada → respaldo, clave mala → revisa .env, sin internet). 916 tests OK.
 - 05/11 Dev HUD: 4 frases de ejemplo pulsables al abrirlo (se esconden tras la primera orden).
+- 05/11 Supervisor: nota tras las mejoras del HUD 6,5/10 (interactividad 3→6, fluidez 5→6); hechas 7 mejoras del plan.
