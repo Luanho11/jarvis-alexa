@@ -228,3 +228,15 @@ Si nada funciona, copia el último mensaje de la ventana negra de Jarvis y enví
 - **Cualquiera que hable con tu Echo** puede dar órdenes a tu PC mientras Jarvis esté encendido.
 - Cuando le pides ver la pantalla, la imagen se envía a Google para analizarla.
 - Las cuotas gratis tienen límites por minuto y por día. Para uso personal normal alcanzan.
+
+---
+
+## Que Jarvis arranque solo al encender el PC
+
+1. En la carpeta `jarvis`, haz doble clic en **`activar_inicio_automatico.bat`**.
+2. Desde ahora, cada vez que enciendas el PC, Jarvis se abrirá solo (minimizado).
+3. Para quitarlo: doble clic en **`quitar_inicio_automatico.bat`**.
+
+## Lo que Jarvis ya sabe de ti
+
+El archivo `memoria.json` (incluido en el zip, no en GitHub) ya trae tu nombre, que programas, juegas, prefieres lo gratis y respuestas cortas y directas. Lo que no era seguro (si eres peruano, si sigues al Barcelona) está marcado "sin confirmar": corrígelo diciéndole "recuerda que…" u "olvida que…".
