@@ -141,3 +141,67 @@ def test_ocultar_minimiza_y_dice_si_habia_ventana(monkeypatch):
     monkeypatch.setattr(panel.config, "HUD_ACTIVO", False)
     monkeypatch.setattr(panel, "_buscar_ventana", lambda intentos: ventana)
     assert panel.ocultar() is False
+
+
+def _esperar_evento(flujo) -> dict:
+    linea = next(flujo).decode()
+    while not linea.startswith("data: "):
+        linea = next(flujo).decode()
+    return json.loads(linea[6:])
+
+
+def test_orden_del_hud_ejecuta_solo_las_permitidas(cliente, monkeypatch):
+    hechas = []
+    monkeypatch.setattr(panel, "_ordenes", lambda: {"pausa": lambda: hechas.append("pausa") or "Hecho."})
+    assert cliente.post("/hud/orden", json={"orden": "pausa"}).status_code == 200
+    assert hechas == ["pausa"]
+    assert cliente.post("/hud/orden", json={"orden": "apagar"}).status_code == 400
+
+
+@pytest.mark.parametrize(
+    "opciones",
+    [
+        {"data": '{"orden": "pausa"}', "content_type": "text/plain"},
+        {"json": {"orden": "pausa"}, "headers": {"Origin": "https://web-mala.com"}},
+        {"json": {"orden": "pausa"}, "headers": {"X-Forwarded-For": "1.2.3.4"}},
+    ],
+)
+def test_otra_web_o_internet_no_pueden_mandar_ordenes(cliente, monkeypatch, opciones):
+    monkeypatch.setattr(panel, "_ordenes", lambda: pytest.fail("no debía ejecutarse"))
+    assert cliente.post("/hud/orden", **opciones).status_code == 403
+
+
+def test_las_ordenes_reales_existen():
+    assert set(panel._ordenes()) == {"pausa", "cancelar_apagado", "dejar_de_vigilar", "ocultar"}
+
+
+def test_lo_escrito_se_contesta_por_los_eventos(cliente, monkeypatch):
+    monkeypatch.setattr(panel, "_responder", lambda texto: f"Respuesta a {texto}")
+    respuesta = cliente.get("/hud/eventos", buffered=False)
+    flujo = iter(respuesta.response)
+    next(flujo)
+    assert cliente.post("/hud/escribir", json={"texto": "  hola  "}).status_code == 202
+    assert _esperar_evento(flujo) == {"tipo": "usuario", "texto": "hola"}
+    assert _esperar_evento(flujo) == {"tipo": "respuesta", "texto": "Respuesta a hola"}
+    respuesta.close()
+
+
+def test_un_fallo_al_contestar_lo_escrito_se_explica(cliente, monkeypatch):
+    def falla(texto):
+        raise RuntimeError("sin red")
+
+    monkeypatch.setattr(panel, "_responder", falla)
+    respuesta = cliente.get("/hud/eventos", buffered=False)
+    flujo = iter(respuesta.response)
+    next(flujo)
+    cliente.post("/hud/escribir", json={"texto": "hola"})
+    _esperar_evento(flujo)
+    assert _esperar_evento(flujo) == {"tipo": "respuesta", "texto": panel.FALLO_ESCRITO}
+    respuesta.close()
+
+
+def test_texto_vacio_o_sin_cerebro_se_rechaza(cliente, monkeypatch):
+    monkeypatch.setattr(panel, "_responder", None)
+    assert cliente.post("/hud/escribir", json={"texto": "hola"}).status_code == 400
+    monkeypatch.setattr(panel, "_responder", lambda texto: "x")
+    assert cliente.post("/hud/escribir", json={"texto": "   "}).status_code == 400

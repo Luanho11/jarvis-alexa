@@ -213,6 +213,69 @@ body[data-estado="espera"] .orbe {
 }
 
 /* Ventana baja: el orbe y la onda se encogen para dejar sitio a la respuesta. */
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.botones button,
+.escribir button {
+  border: 1px solid color-mix(in srgb, var(--acento) 40%, transparent);
+  background: color-mix(in srgb, var(--acento) 10%, transparent);
+  color: var(--texto);
+  border-radius: 999px;
+  padding: 6px 9px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, transform 100ms ease;
+}
+
+.botones button:hover,
+.escribir button:hover {
+  background: color-mix(in srgb, var(--acento) 25%, transparent);
+  border-color: var(--acento);
+}
+
+.botones button:active,
+.escribir button:active {
+  transform: scale(0.96);
+}
+
+.escribir {
+  display: flex;
+  gap: 8px;
+}
+
+.escribir input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--acento) 35%, transparent);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--texto);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.escribir input:focus {
+  border-color: var(--acento);
+}
+
+.escribir input::placeholder {
+  color: var(--tenue);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+
 @media (max-height: 560px) {
   body { gap: 10px; padding: 10px 16px; }
   .orbe { width: 96px; }

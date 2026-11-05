@@ -214,6 +214,8 @@ def crear_app(cerebro, verificar=True):
     adaptador = SkillAdapter(skill=sb.create(), skill_id=ALEXA_SKILL_ID, app=app)
     adaptador.register(app=app, route="/alexa", endpoint="alexa")
     app.register_blueprint(panel.rutas)
+    # Lo escrito en el HUD sigue el mismo camino que lo hablado, con su propia conversación.
+    panel.al_escribir(lambda texto: voz.texto_plano(cerebro.responder("hud", texto)))
     return app
 
 

@@ -34,6 +34,18 @@
   <p id="aviso" class="aviso"></p>
   <p id="latencia" class="latencia"></p>
 
+  <nav class="botones" aria-label="Controles">
+    <button type="button" data-orden="pausa" title="Pausa o reanuda la música o el vídeo">⏯ Pausa</button>
+    <button type="button" data-orden="cancelar_apagado" title="Cancela un apagado o reinicio programado">⏻ Anular apagado</button>
+    <button type="button" data-orden="dejar_de_vigilar" title="Deja de comentar la pantalla">👁 No vigilar</button>
+    <button type="button" data-orden="ocultar" title="Minimiza esta ventana">▾ Ocultar</button>
+  </nav>
+
+  <form id="escribir" class="escribir" autocomplete="off">
+    <input id="texto" name="texto" maxlength="500" placeholder="Escríbele a Jarvis…" aria-label="Escríbele a Jarvis">
+    <button type="submit" aria-label="Enviar">➤</button>
+  </form>
+
   <script src="/hud/siriwave.umd.js"></script>
   <script src="/hud/hud.js"></script>
 </body>

@@ -108,6 +108,34 @@ fuente.onmessage = (mensaje) => {
   manejadores[tipo]?.(texto);
 };
 
+// Las órdenes van en JSON: el servidor lo exige para que otra web del PC no pueda enviarlas.
+async function enviar(ruta, datos) {
+  try {
+    const respuesta = await fetch(ruta, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    });
+    if (!respuesta.ok) avisar("Jarvis no aceptó la orden.");
+  } catch {
+    avisar("No hay conexión con Jarvis. ¿Está abierto iniciar.bat?");
+  }
+}
+
+for (const boton of document.querySelectorAll("[data-orden]")) {
+  boton.addEventListener("click", () => enviar("/hud/orden", { orden: boton.dataset.orden }));
+}
+
+const formulario = document.getElementById("escribir");
+const campo = document.getElementById("texto");
+formulario.addEventListener("submit", (evento) => {
+  evento.preventDefault();
+  const texto = campo.value.trim();
+  if (!texto) return;
+  campo.value = "";
+  enviar("/hud/escribir", { texto });
+});
+
 function actualizarReloj() {
   elementos.reloj.textContent = new Date().toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" });
 }
