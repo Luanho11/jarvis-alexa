@@ -5,7 +5,7 @@ música y YouTube, volumen, programas, apagar el PC, Word, archivos y ventanas, 
 noticias, agenda, recordatorios, memoria, modos y una ventana visual que puede mirar tu pantalla.
 Todo con planes gratuitos: no hace falta pagar nada.
 
-Versión 1.1.0 (cambios en `CHANGELOG.md`).
+Versión 1.3.0 (cambios en `CHANGELOG.md`).
 
 Cómo funciona: Alexa envía lo que dices a un pequeño programa en tu PC (a través de ngrok),
 el programa se lo pasa a la IA (Groq o Gemini) y Alexa lee la respuesta.
