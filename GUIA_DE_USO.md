@@ -230,7 +230,7 @@ Si nada funciona, abre el registro (clic derecho en el icono, **Ver registro**),
 
 ## Bueno saber
 
-- **La PC debe estar encendida** y con las dos ventanas abiertas para que funcione.
+- **La PC debe estar encendida** y con el icono de Jarvis junto al reloj para que funcione.
 - Tienes que empezar con **"Alexa, abre mi jarvis"**: Alexa no deja reemplazar su cerebro por completo.
 - **Cualquiera que hable con tu Echo** puede dar órdenes a tu PC mientras Jarvis esté encendido.
 - Cuando le pides ver la pantalla, la imagen se envía a Google para analizarla.

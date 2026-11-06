@@ -84,7 +84,8 @@ Usa la **misma cuenta de Amazon** de tu Echo.
    ```
    (`NGROK_DOMINIO` va sin `https://`).
 3. Vuelve a abrir `iniciar.bat`. La primera vez instala lo necesario (unos minutos).
-   Se abren dos ventanas: la de Jarvis y la de ngrok. **Déjalas abiertas** mientras lo uses.
+   La ventana negra se cierra sola y queda un icono de Jarvis junto al reloj (clic derecho: Abrir panel,
+   Ver registro, Editar claves, Salir). Para depurar con consola: `.venv\Scripts\python servidor.py`.
 
 Para probar sin el Echo: en la pestaña *Test* de la consola escribe `abre mi jarvis`.
 
